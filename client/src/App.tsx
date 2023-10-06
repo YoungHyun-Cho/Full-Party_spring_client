@@ -21,6 +21,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from './reducers';
 import { RootReducerType } from './store/store';
 import { SIGNIN_SUCCESS } from './actions/signinType';
+import dotenv from "dotenv";
 
 declare global {
   interface Window {
