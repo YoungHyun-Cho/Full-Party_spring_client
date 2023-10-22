@@ -157,7 +157,7 @@ type Props = {
 
 export default function QuestCard ({ party }: Props) {
   const navigate = useNavigate();
-  const { id, name, memberLimit, startDate, endDate, leaderId, favorite, tag, isOnline, region, members } = party;
+  const { id, name, memberLimit, startDate, endDate, leaderId, favorite, tags, isOnline, region, members } = party;
 
   const userId = useSelector(
     (state: AppState) => state.signinReducer.userInfo.id
@@ -186,7 +186,7 @@ export default function QuestCard ({ party }: Props) {
         </div>
         <div className="rightWrapper">
           <div className="tagContainer">
-            { tag.map((t: string, idx: number) =>
+            { tags.map((t: string, idx: number) =>
               <button
                 key={idx}
                 className="tag"

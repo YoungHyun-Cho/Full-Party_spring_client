@@ -8,7 +8,7 @@ import EmptyCard from '../components/EmptyCard';
 import AddressModal from '../components/AddressModal';
 import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { cookieParser } from "../App";
+import { cookieParser, Headers } from "../App";
 import { AppState } from '../reducers';
 import { NOTIFY } from '../actions/notify';
 
@@ -42,32 +42,41 @@ export default function List() {
 
   const searchRegion = userInfo.address.split(" ")[0] + " " + userInfo.address.split(" ")[1];
   const [ isLoading, setIsLoading ] = useState(true);
-  const [ myParty, setMyParty ] = useState([]);
-  const [ localParty, setLocalParty ] = useState([]);
+  const [ myParties, setMyParties ] = useState([]);
+  const [ localParties, setLocalParties ] = useState([]);
+
+  const headers: Headers = {
+    Authorization: cookieParser()["token"],
+    Refresh: cookieParser()["refresh"]
+  };
 
   useEffect(() => {
     setIsLoading(true);
     (async () => {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/list/${userInfo.id}/${searchRegion}`, {
-        withCredentials: true
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/parties?region=${searchRegion}`, {
+        // withCredentials: true
+        headers
       });
+      console.log(response.data);
       dispatch({
         type: NOTIFY,
         payload: {
           isBadgeOn: response.data.notification
         }
       });
-      const parsedLocalParty = response.data.localParty.map((item: any) => ({ ...item, latlng: JSON.parse(item.latlng) }));
-      setLocalParty(parsedLocalParty.filter((party: any) => {
-        return party.memberLimit !== party.members.length
+      // const parsedLocalParty = response.data.localQuests.map((item: any) => ({ ...item, latlng: JSON.parse(item.latlng) }));
+      const parsedLocalParties = response.data.localParties;
+      setLocalParties(parsedLocalParties.filter((party: any) => {
+        return party.memberLimit !== party.members.length;
       }));
-      setMyParty(response.data.myParty);
+      setMyParties(response.data.myParties);
+      setIsLoading(false); // 중복 렌더링 발생하여 일시적으로 변경함. 추후 영구 반영 결정 필요
     })();
   }, [ userInfo ]);
 
-  useEffect(() => {
-    setIsLoading(false);
-  }, [ localParty, myParty ]);
+  // useEffect(() => {
+  //   setIsLoading(false);
+  // }, [ localParties, myParties ]);
 
   if (isLoading) return <Loading />
 
@@ -78,18 +87,20 @@ export default function List() {
 
   return (
     <ListContainer>
-      {myParty.length > 0 ?
+      {/* {console.log("myparties : " + myParties)} */}
+      {myParties.length > 0 ?
         <section className="listSection">
           <header className="listHeader">
             내 파티의 최근 소식
           </header>
           <main>
-            <PartySlide myParty={myParty} />
+            <PartySlide myParties={myParties} />
           </main>
         </section>
       : null}
-      {localParty.length > 0 ?
-        <LocalQuest location={userInfo.address} localParty={localParty} />
+      {/* {console.log("localparties : " + localParties)} */}
+      {localParties.length > 0 ?
+        <LocalQuest location={userInfo.address} localParty={localParties} />
         : <EmptyCard from="list" />}
     </ListContainer>
   );

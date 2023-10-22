@@ -929,7 +929,7 @@ export default function Mypage() {
           </fieldset>
             {(() => {
               if(parties.length > 0){
-                return <PartySlide myParty={parties} />
+                return <PartySlide myParties={parties} />
               } else {
                 return <EmptyParty />
               }

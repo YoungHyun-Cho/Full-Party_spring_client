@@ -114,17 +114,17 @@ const PrevArrow = (props: any) => {
 };
 
 type Props = {
-  myParty: Array<{[key: string]: any}>
+  myParties: Array<{[key: string]: any}>
 };
 
-export default function PartySlide({ myParty }: Props) {
+export default function PartySlide({ myParties }: Props) {
   const navigate = useNavigate();
   const settings = {
     dots: true,
     arrows: true,
-    infinite: false,
+    infinite: myParties.length > 3,
     speed: 400,
-    slidesToShow: (myParty.length <= 3 ? 1 : 3),
+    slidesToShow: (myParties.length <= 3 ? 1 : 3),
     slidesToScroll: 1,
     initialSlide: 0,
     nextArrow: <NextArrow />,
@@ -135,7 +135,7 @@ export default function PartySlide({ myParty }: Props) {
         settings: {
           slidesToShow: 3,
           slidesToScroll: 3,
-          infinite: true,
+          infinite: myParties.length > 3,
           dots: true
         }
       },
@@ -163,26 +163,27 @@ export default function PartySlide({ myParty }: Props) {
     <PartySlideContainer>
       <link rel="stylesheet" type="text/css" charSet="UTF-8" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css" />
 			<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css" />
-				<Slider {...settings}>
-          {myParty.map((party, idx) => {
-            const { id, name, image, startDate, endDate, isOnline, location } = party;
-            const region = location && location.split(" ").length >= 2 ? location.split(" ")[0] + " " + location.split(" ")[1] : location;
-            return (
-              <div key={idx} className="cover" onClick={() => navigate(`../party/${id}`)}>
-                <h3 style={{ backgroundImage: `url(${image})`, backgroundSize: "cover", backgroundPosition: "center" }} >
-                  <div className="partyImg" style={{ backgroundColor: "rgba(0, 0, 0, 0.4)" }}>
-                    <div className="title">{name}</div>
-                    <div className="location">
-                      {isOnline ? <><FontAwesomeIcon icon={ faGlobe } className="icon" /> 온라인 퀘스트</>
-                       : <><FontAwesomeIcon icon={ faMapMarkerAlt } className="icon" /> {region}</>}
-                    </div>
-                    <div className="date"><FontAwesomeIcon icon={ faCalendarAlt } className="icon" /> {formatDate(startDate)} ~ {formatDate(endDate)}</div>
+      <Slider {...settings}>
+        {myParties.map((party, idx) => {
+          const { id, name, image, startDate, endDate, isOnline, location } = party;
+          const region = location && location.split(" ").length >= 2 ? location.split(" ")[0] + " " + location.split(" ")[1] : location;
+      
+          return (
+            <div key={idx} className="cover" onClick={() => navigate(`../party/${id}`)}>
+              <h3 style={{ backgroundImage: `url(${image})`, backgroundSize: "cover", backgroundPosition: "center" }} >
+                <div className="partyImg" style={{ backgroundColor: "rgba(0, 0, 0, 0.4)" }}>
+                  <div className="title">{name}</div>
+                  <div className="location">
+                    {isOnline ? <><FontAwesomeIcon icon={ faGlobe } className="icon" /> 온라인 퀘스트</>
+                      : <><FontAwesomeIcon icon={ faMapMarkerAlt } className="icon" /> {region}</>}
                   </div>
-                </h3>
-              </div>
-            )
-          })}
-				</Slider>
+                  <div className="date"><FontAwesomeIcon icon={ faCalendarAlt } className="icon" /> {formatDate(startDate)} ~ {formatDate(endDate)}</div>
+                </div>
+              </h3>
+            </div>
+          )
+        })}
+      </Slider>
     </PartySlideContainer>
   );
 }

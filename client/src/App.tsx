@@ -38,14 +38,19 @@ export const cookieParser = () => {
   return cookieObject;
 };
 
+export type Headers = {
+  Authorization?: string;
+  Refresh?: string;
+}
+
 export const requestKeepLoggedIn = async (token: string, signupType: string) => {
-  const response = await axios.post(`${process.env.REACT_APP_API_URL}/keeping`, {}, {
-    headers: {
-      access_token: token,
-      signup_type: signupType
-    }
-  });
-  return response;
+  // const response = await axios.post(`${process.env.REACT_APP_API_URL}/keeping`, {}, {
+  //   headers: {
+  //     access_token: token,
+  //     signup_type: signupType
+  //   }
+  // });
+  // return response;
 };
 
 export default function App() {
@@ -67,12 +72,12 @@ export default function App() {
     }
     const { token, signupType, isLoggedIn } = cookieParser();
     if (token !== "temp" && signupType !== "temp" && isLoggedIn !== "0") {
-      requestKeepLoggedIn(token, signupType).then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
-        });
-      });
+      // requestKeepLoggedIn(token, signupType).then((res) => {
+      //   dispatch({
+      //     type: SIGNIN_SUCCESS,
+      //     payload: res.data.userInfo
+      //   });
+      // });
     }
   }, []);
 

@@ -33,6 +33,7 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
 
     case SIGNIN_SUCCESS:
       const { id, userName, profileImage, address, signupType } = action.payload;
+
       return {
         ...state,
         isLoggedIn: true,

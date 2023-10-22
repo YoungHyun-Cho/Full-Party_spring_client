@@ -90,7 +90,8 @@ export default function LocalMap({ location, localParty }: Props) {
     return (
       <>
         <MapMarker
-          position={party.latlng}
+          // position={party.latlng}
+          position={party.coordinates}
           image={{
             src: "img/mapMarker.png",
             size: { width: 30, height: 30 },
@@ -101,7 +102,8 @@ export default function LocalMap({ location, localParty }: Props) {
           onMouseOut={() => setIsVisible(false)}
         />
         <CustomOverlayMap
-          position={party.latlng}
+          // position={party.latlng}
+          position={party.coordinates}
           yAnchor={3.1}
         >
           <div className="partyImg"
@@ -114,7 +116,8 @@ export default function LocalMap({ location, localParty }: Props) {
 
         {isVisible?
           <CustomOverlayMap
-            position={party.latlng}
+            // position={party.latlng}
+            position={party.coordinates}
           >
             <div className="infoWindow">
               <div className="navigate" onClick={() => navigate(`../party/${party.id}`)}>

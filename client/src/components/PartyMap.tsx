@@ -76,7 +76,7 @@ type Props = {
 export default function PartyMap({ isMember, latlng, image }: Props) {
   const { kakao } = window;
   const [ coords, setCoords ] = useState(latlng);
-  const { lat, lng } = coords;
+  const { lat: lat, lng: lng } = coords;
   const level = (isMember ? 4 : 5);
   const zoomable = (isMember ? true : false);
 
