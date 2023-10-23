@@ -12,7 +12,7 @@ export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<Use
   const headers: Headers = {};
 
   await axios.post(`${process.env.REACT_APP_API_URL}/auth/signin`, userInfo, {
-    // withCredentials: true
+    withCredentials: true
   })
   .then((res) => {
     if (res.status === 200) {
@@ -20,8 +20,8 @@ export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<Use
       headers.Authorization = res.headers['authorization'];
       headers.Refresh = res.headers['refresh'];
 
-      document.cookie = `token=${res.headers['authorization']}`; // -> 쿠키에 토큰 저장 완료..
-      document.cookie = `refresh=${res.headers['refresh']}`;
+      // document.cookie = `token=${res.headers['authorization']}`; // -> 쿠키에 토큰 저장 완료..
+      // document.cookie = `refresh=${res.headers['refresh']}`;
 
       dispatch({
         type: SIGNIN_SUCCESS,

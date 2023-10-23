@@ -5,7 +5,7 @@ import LocalQuest from '../components/LocalQuest';
 import EmptyCard from '../components/EmptyCard';
 import Loading from '../components/Loading';
 import { useDispatch } from 'react-redux';
-import { cookieParser, requestKeepLoggedIn } from "../App";
+import { cookieParser } from "../App";
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';

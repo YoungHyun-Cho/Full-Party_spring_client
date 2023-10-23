@@ -157,7 +157,7 @@ type Props = {
 
 export default function QuestCard ({ party }: Props) {
   const navigate = useNavigate();
-  const { id, name, memberLimit, startDate, endDate, leaderId, favorite, tags, isOnline, region, members } = party;
+  const { id, name, memberLimit, startDate, endDate, leaderId, favorite, tags, isOnline, region, memberList } = party;
 
   const userId = useSelector(
     (state: AppState) => state.signinReducer.userInfo.id
@@ -209,7 +209,7 @@ export default function QuestCard ({ party }: Props) {
           <div className="infoHeader">
             <div
               className="leaderProfile"
-              style={{ backgroundImage: `url(${members[0].profileImage})`, backgroundSize: "cover" }}
+              style={{ backgroundImage: `url(${memberList[0].profileImage})`, backgroundSize: "cover" }}
             />
             <div className="infoContainer">
               <div className="title">
@@ -232,10 +232,10 @@ export default function QuestCard ({ party }: Props) {
 
         <MemberWrapper>
           <div className="label">
-            참여중인 파티원({members.length}/{memberLimit})
+            참여중인 파티원({memberList.length}/{memberLimit})
           </div>
           <div className="memberContainer">
-            {members.map((member: { id: number, profileImage: string }, idx: number) => {
+            {memberList.map((member: { id: number, profileImage: string }, idx: number) => {
               if(member.id !== leaderId){
                 return (
                   <div
@@ -249,7 +249,7 @@ export default function QuestCard ({ party }: Props) {
                 return null;
               }
             })}
-            {[...Array(memberLimit - members.length)].map((n, idx) =>
+            {[...Array(memberLimit - memberList.length)].map((n, idx) =>
               <div key={idx} className="memberProfile wanted">
                 <FontAwesomeIcon icon={ faExclamation } />
               </div>

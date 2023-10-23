@@ -8,7 +8,7 @@ import ErrorModal from '../components/ErrorModal';
 import Loading from '../components/Loading';
 import AddressInput from '../components/AddressInput';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { cookieParser } from "../App";
+import { cookieParser, Headers } from "../App";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
 import { useSelector } from 'react-redux';
@@ -623,15 +623,20 @@ export default function Post() {
     (state: RootReducerType) => state.signinReducer
   );
 
+  const headers: Headers = {
+    Authorization: cookieParser()["token"],
+    Refresh: cookieParser()["refresh"]
+  };
+
   AWS.config.update({
     region: "ap-northeast-2",
     credentials: new AWS.CognitoIdentityCredentials({
-      IdentityPoolId: "ap-northeast-2:d4282d0a-72a9-4d98-a6b6-335f48bbf863"
+      IdentityPoolId: "ap-northeast-2:bffd0059-03d2-4bb8-afc1-7690dd1011b9"
     })
   });
 
   const [ partyInfo, setPartyInfo ] = useState({
-    image: 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png',
+    image: 'https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png',
     name: '',
     startDate: '',
     endDate: '',
@@ -691,7 +696,7 @@ export default function Post() {
     const code = String(Math.floor(Math.random()*1000000)).padStart(8,"0");
     const upload = new AWS.S3.ManagedUpload({
       params: {
-        Bucket: "teo-img",
+        Bucket: "fullpartyspringimageserver",
         Key: `${signinReducer.userInfo.id}_${code}_image.jpg`,
         Body: file
       }
@@ -785,6 +790,7 @@ export default function Post() {
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+
     setPartyInfo({
       ...partyInfo,
       [name]: value
@@ -928,27 +934,25 @@ export default function Post() {
   };
 
   const postParty = async () => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/list/creation`, {
-      userId: signinReducer.userInfo?.id,
-      partyInfo: {
-        name: partyInfo.name,
-        image: partyInfo.image,
-        memberLimit: partyInfo.memberLimit,
-        content: partyInfo.content,
-        region:
-          isOnline?
-          signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
-          : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
-        location: partyInfo.location,
-        latlng: isOnline? {lat: 0, lng: 0} : partyInfo.latlng,
-        startDate: partyInfo.startDate,
-        endDate: partyInfo.endDate,
-        isOnline: isOnline,
-        privateLink: partyInfo.privateLink,
-        tag: tags
-      }
+
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/parties`, {
+      name: partyInfo.name,
+      image: partyInfo.image,
+      memberLimit: partyInfo.memberLimit,
+      content: partyInfo.content,
+      region:
+        isOnline?
+        signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
+        : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
+      location: partyInfo.location,
+      coordinates: isOnline? {lat: 0, lng: 0} : partyInfo.latlng,
+      startDate: partyInfo.startDate,
+      endDate: partyInfo.endDate,
+      isOnline: isOnline,
+      privateLink: partyInfo.privateLink,
+      tags
     }, {
-      withCredentials: true
+      headers
     });
     return res;
   }
@@ -962,9 +966,12 @@ export default function Post() {
       postParty()
       .then((res) => {
         setIsPosted(false);
-        navigate(`../party/${res.data.newParty.partyId}`);
+        // navigate(`../party/${res.data.newParty.id}`); 
+        navigate(`../party/${res.headers.location}`);// 헤더에 설정된 Location값으로 리디렉션
+
       })
       .catch((err) => {
+        console.log(err);
         setIsErrorModalOpen(true);
         setIsPosted(false);
       });
@@ -1003,7 +1010,8 @@ export default function Post() {
             <>
               <img className="preview" src={partyInfo.image} alt="thumbnail"
                 onError={() => {
-                  return (imgRef.current.src = 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png')
+                  // return (imgRef.current.src = 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png')
+                  return (imgRef.current.src = 'https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png')
                 }}
               />
               <input 

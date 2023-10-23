@@ -67,7 +67,7 @@ export default function List() {
       // const parsedLocalParty = response.data.localQuests.map((item: any) => ({ ...item, latlng: JSON.parse(item.latlng) }));
       const parsedLocalParties = response.data.localParties;
       setLocalParties(parsedLocalParties.filter((party: any) => {
-        return party.memberLimit !== party.members.length;
+        return party.memberLimit !== party.memberList.length;
       }));
       setMyParties(response.data.myParties);
       setIsLoading(false); // 중복 렌더링 발생하여 일시적으로 변경함. 추후 영구 반영 결정 필요

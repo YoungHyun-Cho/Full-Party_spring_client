@@ -322,11 +322,11 @@ export default function Party() {
     partyState: 0,
     region: "",
     location: "",
-    latlng: { lat: 0, lng: 0 },
+    coordinates: { lat: 0, lng: 0 },
     memberLimit: 2,
     isReviewed: false,
-    isFavorite: false,
-    members: [{
+    isHeart: false,
+    memberList: [{
       exp: 0,
       id: 0,
       joinDate: "",
@@ -334,8 +334,8 @@ export default function Party() {
       profileImage: "",
       userName: ""
     }],
-    tag: [],
-    waitingQueue: [{
+    tags: [],
+    waiterList: [{
       id: 0,
       userName: "",
       profileImage: "",
@@ -362,28 +362,28 @@ export default function Party() {
     if (action === "accept") {
       setPartyInfo({
         ...partyInfo,
-        members: [ ...partyInfo.members, { ...userInfo, joinDate: new Date().toISOString(), isReviewd: false } ]
+        memberList: [ ...partyInfo.memberList, { ...userInfo, joinDate: new Date().toISOString(), isReviewd: false } ]
       });
     }
     else if (action === "refuse") {
       setPartyInfo({
         ...partyInfo,
-        waitingQueue: partyInfo.waitingQueue.filter((waiter) => waiter.id !== userInfo)
+        waiterList: partyInfo.waiterList.filter((waiter) => waiter.id !== userInfo)
       });
     }
     else if (action === "expel") {
       setPartyInfo({
         ...partyInfo,
-        members: partyInfo.members.filter((member) => member.id !== userInfo)
+        memberList: partyInfo.memberList.filter((member) => member.id !== userInfo)
       });
     }
   };
 
   const handleMemberInfoChange = (userId: number, key: string, value: any) => {
-    const newMemberInfo = partyInfo.members.map((member) => (member.id === userId ? { ...member, [key]: value } : member));
+    const newMemberInfo = partyInfo.memberList.map((member) => (member.id === userId ? { ...member, [key]: value } : member));
     setPartyInfo({
       ...partyInfo,
-      members: newMemberInfo,
+      memberList: newMemberInfo,
     });
   };
 
@@ -393,25 +393,25 @@ export default function Party() {
      }, {
       withCredentials: true
     });
-    if (partyInfo.isFavorite) {
+    if (partyInfo.isHeart) {
       setPartyInfo({
         ...partyInfo,
         favorite: partyInfo.favorite - 1,
-        isFavorite: false,
+        isHeart: false,
       });
     }
     else {
       setPartyInfo({
         ...partyInfo,
         favorite: partyInfo.favorite + 1,
-        isFavorite: true,
+        isHeart: true,
       });
     }
   };
 
   const shareHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const leader = partyInfo.members.filter((member) => member.id === partyInfo.leaderId)[0];
-    const hashtags = partyInfo.tag.map((t) => `#${t}`).join(" ");
+    const leader = partyInfo.memberList.filter((member) => member.id === partyInfo.leaderId)[0];
+    const hashtags = partyInfo.tags.map((t) => `#${t}`).join(" ");
 
     Kakao.Link.sendDefault({
       objectType: 'feed',
@@ -430,7 +430,7 @@ export default function Party() {
       },
       social: {
         likeCount: partyInfo.favorite,
-        subscriberCount: partyInfo.members.length
+        subscriberCount: partyInfo.memberList.length
       },
       buttonTitle: '퀘스트 참여하기'
     });
@@ -444,8 +444,8 @@ export default function Party() {
 
   const userInfoModalHandler = (event: React.MouseEvent<HTMLDivElement>, from: string, listIdx: number): void => {
     setFrom(from);
-    if (from === "members") setUserInfo(partyInfo.members[listIdx]);
-    else setUserInfo(partyInfo.waitingQueue[listIdx]);
+    if (from === "members") setUserInfo(partyInfo.memberList[listIdx]);
+    else setUserInfo(partyInfo.waiterList[listIdx]);
     setIsUserInfoModalOpen(!isUserInfoModalOpen);
   };
 
@@ -468,10 +468,10 @@ export default function Party() {
 
   const cancelHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyInfo.id}/cancel/${userId}`);
-    const waiterLeft = partyInfo.waitingQueue.filter((waiter) => waiter.id !== userId);
+    const waiterLeft = partyInfo.waiterList.filter((waiter) => waiter.id !== userId);
     setPartyInfo({
       ...partyInfo,
-      waitingQueue: waiterLeft,
+      waiterList: waiterLeft,
     });
     setUserState({
       ...userState,
@@ -481,10 +481,10 @@ export default function Party() {
 
   const quitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyInfo.id}/quit/${userId}`);
-    const memberLeft = partyInfo.members.filter((member) => member.id !== userId);
+    const memberLeft = partyInfo.memberList.filter((member) => member.id !== userId);
     setPartyInfo({
       ...partyInfo,
-      members: memberLeft,
+      memberList: memberLeft,
     });
     setUserState({
       ...userState,
@@ -525,9 +525,10 @@ export default function Party() {
     setIsUserInfoModalOpen(false);
     setIsLoading(true);
     if (params.commentId) setFindComment(Number(params.commentId));
-    axios.get(`${process.env.REACT_APP_API_URL}/party/${params.partyId}/${userId}`)
+    axios.get(`${process.env.REACT_APP_API_URL}/parties/${params.partyId}`)
     .then(res => {
-      setPartyInfo({ ...res.data.partyInfo, latlng: JSON.parse(res.data.partyInfo.latlng) });
+      console.log(res);
+      setPartyInfo({ ...res.data });
       setComments(res.data.comments);
       dispatch({
         type: NOTIFY,
@@ -537,6 +538,7 @@ export default function Party() {
       });
     })
     .catch(err => {
+      console.log(err);
       if (err.response.status === 404) {
         setNotFound(true);
         setIsLoading(false);
@@ -554,14 +556,14 @@ export default function Party() {
         isWaiting: false
       });
     }
-    else if (partyInfo.members.filter((item: any) => item.id === userId).length) {
+    else if (partyInfo.memberList.filter((item: any) => item.id === userId).length) {
       setUserState({
         isLeader: false,
         isMember: true,
         isWaiting: false
       });
     }
-    else if (partyInfo.waitingQueue.filter((item: any) => item.id === userId).length) {
+    else if (partyInfo.waiterList.filter((item: any) => item.id === userId).length) {
       setUserState({
         isLeader: false,
         isMember: false,
@@ -593,7 +595,7 @@ export default function Party() {
             {isLoggedIn === "1" ?
               <button onClick={favoriteHandler}>
                 <FontAwesomeIcon 
-                  icon={partyInfo.isFavorite ? faHeart : blankFaHeart} 
+                  icon={partyInfo.isHeart ? faHeart : blankFaHeart} 
                   className="favorite" 
                 />
               </button>
@@ -646,13 +648,13 @@ export default function Party() {
             disabled={isLoggedIn === "0"}
           >
             <FontAwesomeIcon 
-              icon={partyInfo.isFavorite ? faHeart : blankFaHeart}
+              icon={partyInfo.isHeart ? faHeart : blankFaHeart}
               className="favorite" 
             />
             &nbsp;{ partyInfo.favorite }
           </button>
           <div className="tagContainer">
-            { partyInfo.tag.map((t, idx) => 
+            { partyInfo.tags.map((t, idx) => 
               <button 
                 key={idx} 
                 className="tag" 
@@ -697,7 +699,7 @@ export default function Party() {
           <div className="mapDesc">
             <PartyMap
               isMember={isMember}
-              latlng={partyInfo.latlng}
+              latlng={partyInfo.coordinates}
               image={partyInfo.image}
             />  
             {!isMember? "파티원에게는 더 정확한 장소가 표시됩니다." : null}
@@ -710,13 +712,13 @@ export default function Party() {
             <MemberList
               from="members"
               leaderId={partyInfo.leaderId}
-              members={partyInfo.members}
+              members={partyInfo.memberList}
               userInfoModalHandler={userInfoModalHandler}
             />
           </div>
         </MembersContainer>
 
-        {isLeader && partyInfo.partyState <= 0 && partyInfo.memberLimit > partyInfo.members.length ? 
+        {isLeader && partyInfo.partyState <= 0 && partyInfo.memberLimit > partyInfo.memberList.length ? 
           <MembersContainer>
             <div className="members">
               <div className="label waitingList" onClick={waitingListHandler}>
@@ -726,7 +728,7 @@ export default function Party() {
                 <MemberList
                   from="waitingQueue"
                   leaderId={partyInfo.leaderId}
-                  members={partyInfo.waitingQueue}
+                  members={partyInfo.waiterList}
                   userInfoModalHandler={userInfoModalHandler}
                 />
               : null}
@@ -769,16 +771,16 @@ export default function Party() {
           {isLeader && partyInfo.partyState === 0 ? 
             <button onClick={editHandler}>정보 수정</button> 
           : null}
-          {isLeader && partyInfo.partyState === 0 && partyInfo.members.length > 1 && partyInfo.memberLimit > partyInfo.members.length ? 
+          {isLeader && partyInfo.partyState === 0 && partyInfo.memberList.length > 1 && partyInfo.memberLimit > partyInfo.memberList.length ? 
             <button onClick={(e) => partyCancelModalHandler(e, "fullParty")}>모집 완료</button> 
           : null}
-          {isLeader && partyInfo.partyState === 1 && partyInfo.memberLimit > partyInfo.members.length && !partyInfo.isReviewed ? 
+          {isLeader && partyInfo.partyState === 1 && partyInfo.memberLimit > partyInfo.memberList.length && !partyInfo.isReviewed ? 
             <button onClick={rePartyHandler}>모집 재개</button> 
           : null}
           {isLeader && !partyInfo.isReviewed ? 
             <button onClick={(e) => partyCancelModalHandler(e, "dismiss")}>파티 해산</button>
           : null}
-          {isLeader && ( partyInfo.partyState === 1 || partyInfo.memberLimit === partyInfo.members.length ) && !partyInfo.isReviewed? 
+          {isLeader && ( partyInfo.partyState === 1 || partyInfo.memberLimit === partyInfo.memberList.length ) && !partyInfo.isReviewed? 
             <button id="completeBtn" onClick={reviewModalHandler}>퀘스트 완료</button>
           : null}
           {isMember && partyInfo.partyState === 2 && !partyInfo.isReviewed ? 
@@ -812,7 +814,7 @@ export default function Party() {
       {isReviewModalOpen? 
         <ReviewModal 
           reviewModalHandler={reviewModalHandler}
-          members={partyInfo.members.filter((member) => member.id !== userId)}
+          members={partyInfo.memberList.filter((member) => member.id !== userId)}
           leaderId={partyInfo.leaderId}
           isLeader={isLeader}
           userId={userId}

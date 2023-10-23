@@ -185,7 +185,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
   const [ newComment, setNewComment ] = useState({comment: "", subcomment: ""});
   const [ isCommentDeleteModalOpen, setIsCommentDeleteModalOpen ] = useState(false);
   const [ commentToDelete, setCommentToDelete ] = useState({});
-  const curComments = comments.map((comment) => [ comment.comment, ...comment.subComments ])[commentIdx];
+  const curComments = comments.map((comment) => [ comment.comment, ...comment.replies ])[commentIdx];
 
   const formatDate = (date: String) => date.slice(0, 10);
 
