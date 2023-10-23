@@ -73,10 +73,10 @@ export default function App() {
     const { token, signupType, isLoggedIn } = cookieParser();
     if (token !== "temp" && signupType !== "temp" && isLoggedIn !== "0") {
       // requestKeepLoggedIn(token, signupType).then((res) => {
-      //   dispatch({
-      //     type: SIGNIN_SUCCESS,
-      //     payload: res.data.userInfo
-      //   });
+      dispatch({
+        type: SIGNIN_SUCCESS,
+      //   // payload: res.data.userInfo
+      });
       // });
     }
   }, []);

@@ -23,6 +23,11 @@ export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<Use
       // document.cookie = `token=${res.headers['authorization']}`; // -> 쿠키에 토큰 저장 완료..
       // document.cookie = `refresh=${res.headers['refresh']}`;
 
+      localStorage.setItem("id", res.data.id);
+      localStorage.setItem("userName", res.data.userName);
+      localStorage.setItem("profileImage", res.data.profileImage);
+      localStorage.setItem("address", res.data.address);
+
       dispatch({
         type: SIGNIN_SUCCESS,
         payload: res.data

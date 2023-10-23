@@ -3,11 +3,11 @@ export const SIGNIN_FAIL = 'SIGNIN_FAIL';
 export const CLOSE_MODAL = 'CLOSE_MODAL';
 
 export type UserInfo = {
-  id: number,
-  userName: string,
-  profileImage: string,
-  address: string,
-  signupType: string
+  id: any,
+  userName: any,
+  profileImage: any,
+  address: any,
+  signupType: any
 };
 
 export interface signinFailDispatch{

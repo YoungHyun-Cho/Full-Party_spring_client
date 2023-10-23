@@ -1,3 +1,4 @@
+import { cookieParser } from "../App";
 import { SIGNIN_FAIL, SIGNIN_SUCCESS, UserInfo, UserInfoDispatchType } from "../actions/signinType";
 
 interface InitialState {
@@ -32,17 +33,16 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
       };
 
     case SIGNIN_SUCCESS:
-      const { id, userName, profileImage, address, signupType } = action.payload;
 
       return {
         ...state,
         isLoggedIn: true,
         userInfo: {
-          id,
-          userName,
-          profileImage,
-          address,
-          signupType
+          id: localStorage.getItem("id"),
+          userName: localStorage.getItem("userName"),
+          profileImage: localStorage.getItem("profileImage"),
+          address: localStorage.getItem("address"),
+          signupType: cookieParser().signupType
         }
       };
 
