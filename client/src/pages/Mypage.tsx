@@ -10,7 +10,7 @@ import PostCodeModal from '../components/PostCodeModal';
 import EmptyParty from '../components/EmptyParty';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { cookieParser } from "../App";
+import { cookieParser, headers, IMAGE_SERVER_URL } from "../App";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { NOTIFY } from "../actions/notify";
@@ -321,6 +321,11 @@ export default function Mypage() {
   const [ from, setFrom ] = useState('');
   const [ fixedLocation, setFixedLocation ] = useState('');
   const [ formatAddress, setFormatAddress ] = useState('');
+  const [ relatedParties, setRelatedParties ] = useState({
+    leadingParties: [],
+    participatingParties: [],
+    completedParties: []
+  });
   const [ basicInfo, setBasicInfo ] = useState({
     userName: "",
     profileImage: "",
@@ -385,7 +390,7 @@ export default function Mypage() {
   AWS.config.update({
     region: "ap-northeast-2",
     credentials: new AWS.CognitoIdentityCredentials({
-      IdentityPoolId: "ap-northeast-2:d4282d0a-72a9-4d98-a6b6-335f48bbf863"
+      IdentityPoolId: "ap-northeast-2:bffd0059-03d2-4bb8-afc1-7690dd1011b9"
     })
   });
 
@@ -618,28 +623,34 @@ export default function Mypage() {
     }
   }
 
-  const fetchJoinParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`);
-    const myParty = res.data.myParty;
-    setParties(myParty);
+  const filterParticipatingParties = () => {
+    // const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`);
+    // const myParty = res.data.myParty;
+    // setParties(myParty);
+
+    setParties(relatedParties.participatingParties);
   };
 
-  const fetchRecruitParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`);
-    const myParty = res.data.myParty;
-    setParties(myParty);
+  const filterLeadingParties = () => {
+    // const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`);
+    // const myParty = res.data.myParty;
+    // setParties(myParty);
+
+    setParties(relatedParties.leadingParties);
   };
 
-  const fetchCompleteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completing/${signinReducer.userInfo?.id}`);
-    const myParty = res.data.myParty;
-    setParties(myParty);
+  const filterCompletedParties = () => {
+    // const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completing/${signinReducer.userInfo?.id}`);
+    // const myParty = res.data.myParty;
+    // setParties(myParty);
+
+    setParties(relatedParties.completedParties);
   };
 
   const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
-    if (e.currentTarget.value === 0) fetchRecruitParty();
-    else if (e.currentTarget.value === 1) fetchJoinParty();
-    else if (e.currentTarget.value === 2) fetchCompleteParty();
+    if (e.currentTarget.value === 0) filterLeadingParties();
+    else if (e.currentTarget.value === 1) filterParticipatingParties();
+    else if (e.currentTarget.value === 2) filterCompletedParties();
     setCurTab(e.currentTarget.value);
   };
 
@@ -661,10 +672,9 @@ export default function Mypage() {
   const handleWithdrawal = async () => {
     const { token, signupType } = cookieParser();
     const userId = signinReducer.userInfo?.id;
-    await axios.delete(`${process.env.REACT_APP_API_URL}/user/${userId}/${signupType}`, {
-      headers: {
-        access_token: token
-      }
+    await axios.delete(`${process.env.REACT_APP_API_URL}/users/${userId}/${signupType}`, {
+      withCredentials : true, 
+      headers
     });
     dispatch({ type: SIGNIN_FAIL });
     document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
@@ -693,19 +703,20 @@ export default function Mypage() {
   useEffect(() => {
     (async () => {
       if (userInfoFromStore.id >= 1) {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userInfoFromStore.id}`, {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/users/${userInfoFromStore.id}`, {
           withCredentials: true,
         });
+
         dispatch({
           type: NOTIFY,
           payload: {
             isBadgeOn: res.data.notification
           }
         });
-        const userInfo = res.data.userInfo;
+        const userInfo = res.data;
         setBasicInfo({
           userName: userInfo.userName,
-          profileImage: userInfo.profileImage,
+          profileImage: IMAGE_SERVER_URL + `/${userInfo.profileImage}`, 
           address: userInfo.address,
           level: userInfo.level,
           exp: userInfo.exp
@@ -714,14 +725,18 @@ export default function Mypage() {
           ...changeInfo,
           profileImage: userInfo.profileImage
         });
+        setRelatedParties( { ...userInfo.relatedParties });
       }
     })();
-    fetchRecruitParty();
   }, [ userInfoFromStore ]);
 
   useEffect(() => {
     setIsLoading(false);
   }, [ basicInfo ]);
+
+  useEffect(() => {
+    filterLeadingParties();
+  }, [relatedParties]);
 
   if (cookieParser().isLoggedIn === "0") return <Navigate to="../" />
   if (isLoading) return <Loading />
@@ -740,7 +755,7 @@ export default function Mypage() {
         <div className="leftWrapper">
           <div className='profileImageContainer'>
             <img
-              src={basicInfo.profileImage ? basicInfo.profileImage : 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultProfile.png'}
+              src={basicInfo.profileImage ? basicInfo.profileImage : 'https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com/defaultProfile.png'}
               alt='thumbnail'
             />
           </div>

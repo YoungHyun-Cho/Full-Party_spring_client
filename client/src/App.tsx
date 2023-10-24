@@ -54,6 +54,13 @@ export const requestKeepLoggedIn = async (token: string, signupType: string) => 
   // return response;
 };
 
+export const headers: Headers = {
+  Authorization: "Bearer " + cookieParser()["token"],
+  Refresh: cookieParser()["refresh"]
+};
+
+export const IMAGE_SERVER_URL="https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com";
+
 export default function App() {
   const dispatch = useDispatch();
 
@@ -87,6 +94,9 @@ export default function App() {
       //   // payload: res.data.userInfo
       });
       // });
+
+      headers.Authorization = "Bearer " + cookieParser()["token"];
+      headers.Refresh = cookieParser()["refresh"];
     }
   }, []);
 

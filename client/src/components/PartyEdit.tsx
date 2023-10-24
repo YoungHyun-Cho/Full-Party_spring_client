@@ -557,7 +557,7 @@ export default function PartyEdit({ party, editHandler, handleOnOff }: Props) {
   AWS.config.update({
     region: "ap-northeast-2",
     credentials: new AWS.CognitoIdentityCredentials({
-      IdentityPoolId: "ap-northeast-2:d4282d0a-72a9-4d98-a6b6-335f48bbf863"
+      IdentityPoolId: "ap-northeast-2:bffd0059-03d2-4bb8-afc1-7690dd1011b9"
     })
   });
 

@@ -11,6 +11,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { cookieParser, Headers } from "../App";
 import { AppState } from '../reducers';
 import { NOTIFY } from '../actions/notify';
+import { headers } from '../App'; 
 
 export const ListContainer = styled.div`
   width: 100%;
@@ -45,16 +46,11 @@ export default function List() {
   const [ myParties, setMyParties ] = useState([]);
   const [ localParties, setLocalParties ] = useState([]);
 
-  const headers: Headers = {
-    Authorization: cookieParser()["token"],
-    Refresh: cookieParser()["refresh"]
-  };
-
   useEffect(() => {
     setIsLoading(true);
     (async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/parties?region=${searchRegion}`, {
-        // withCredentials: true
+        withCredentials: true, 
         headers
       });
       console.log(response.data);
