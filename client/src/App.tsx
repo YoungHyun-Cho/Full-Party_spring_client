@@ -22,6 +22,7 @@ import { AppState } from './reducers';
 import { RootReducerType } from './store/store';
 import { SIGNIN_SUCCESS } from './actions/signinType';
 import dotenv from "dotenv";
+import { fetchUserdata } from './actions/signin';
 
 declare global {
   interface Window {
@@ -71,7 +72,15 @@ export default function App() {
       document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     }
     const { token, signupType, isLoggedIn } = cookieParser();
-    if (token !== "temp" && signupType !== "temp" && isLoggedIn !== "0") {
+
+    if (token !== "temp" && sessionStorage.getItem("id") === null ) {
+      document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      document.cookie = `refresh=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    }
+
+    else if (token !== "temp" && signupType !== "temp" && isLoggedIn !== "0") {
       // requestKeepLoggedIn(token, signupType).then((res) => {
       dispatch({
         type: SIGNIN_SUCCESS,

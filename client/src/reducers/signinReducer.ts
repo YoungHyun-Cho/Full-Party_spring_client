@@ -38,10 +38,10 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
         ...state,
         isLoggedIn: true,
         userInfo: {
-          id: localStorage.getItem("id"),
-          userName: localStorage.getItem("userName"),
-          profileImage: localStorage.getItem("profileImage"),
-          address: localStorage.getItem("address"),
+          id: sessionStorage.getItem("id"),
+          userName: sessionStorage.getItem("userName"),
+          profileImage: sessionStorage.getItem("profileImage"),
+          address: sessionStorage.getItem("address"),
           signupType: cookieParser().signupType
         }
       };
