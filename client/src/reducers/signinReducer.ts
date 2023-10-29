@@ -10,6 +10,7 @@ const initialState: InitialState = {
   isLoggedIn: null,
   userInfo: {
     id: 0.1,
+    email:"", 
     userName: "",
     profileImage: "https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultProfile.png",
     address: "",
@@ -25,6 +26,7 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
         isLoggedIn: false,
         userInfo: {
           id: 0,
+          email: "",
           userName: "",
           profileImage: "",
           address: "",
@@ -39,6 +41,7 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
         isLoggedIn: true,
         userInfo: {
           id: sessionStorage.getItem("id"),
+          email: sessionStorage.getItem("email"),
           userName: sessionStorage.getItem("userName"),
           profileImage: sessionStorage.getItem("profileImage"),
           address: sessionStorage.getItem("address"),

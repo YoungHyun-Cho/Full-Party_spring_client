@@ -4,7 +4,12 @@ import { CLOSE_MODAL } from "./modalType";
 import { UserInfoDispatchType, SIGNIN_SUCCESS, SIGNIN_FAIL } from "./signinType";
 import { Headers } from "../App";
 
-export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<UserInfoDispatchType>) => {
+type UserInfo = {
+  email: string,
+  password: string
+}
+
+export const fetchUserdata = (userInfo: UserInfo) => async (dispatch: Dispatch<UserInfoDispatchType>) => {
   
   document.cookie = "signupType=general";
   document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
@@ -24,6 +29,7 @@ export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<Use
       // document.cookie = `refresh=${res.headers['refresh']}`;
 
       sessionStorage.setItem("id", res.data.id);
+      sessionStorage.setItem("email", userInfo.email);
       sessionStorage.setItem("userName", res.data.userName);
       sessionStorage.setItem("profileImage", res.data.profileImage);
       sessionStorage.setItem("address", res.data.address);
@@ -38,7 +44,7 @@ export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<Use
     }
   })
   .catch((err) => {
-    if (err.response && err.response.status === 401) {
+    if (err.response && err.response.status === 404) {
       dispatch({
         type: SIGNIN_FAIL
       });

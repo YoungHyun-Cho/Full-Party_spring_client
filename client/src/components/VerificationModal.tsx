@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { error } from 'console';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -89,11 +90,12 @@ export const CloseBtn = styled.button`
 
 type Props = {
   userId: number,
+  email: string, 
   handleIsChange: Function,
   verficationModalHandler: Function
 };
 
-export default function  VerificationModal({ userId, handleIsChange, verficationModalHandler }: Props) {
+export default function  VerificationModal({ userId, email, handleIsChange, verficationModalHandler }: Props) {
   const [ password, setPassword ] = useState('');
   const [ errorMsg, setErrorMsg ] = useState('');
 
@@ -102,18 +104,32 @@ export default function  VerificationModal({ userId, handleIsChange, verfication
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
 
   const handleVerification = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    const verify = await axios.post(`${process.env.REACT_APP_API_URL}/user/verification`, {
-      userInfo: {
-        userId: userId,
-        password: password
-      }
-    });
 
-    if (verify.data.message === "Unauthorized User") setErrorMsg('비밀번호가 틀렸습니다. 다시 확인해주세요.');
-    else if (verify.data.message === "User Identified") {
-      handleIsChange();
-      closeModal();
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/auth/verification`, 
+        { userId, email, password },
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        handleIsChange();
+        closeModal();
+      }
     }
+    catch (error: any) {
+      if (error.response.status === 404) setErrorMsg('비밀번호가 틀렸습니다. 다시 확인해주세요.');
+    }
+
+    // console.log(response);
+
+    // if (response.data.message === "Unauthorized User") setErrorMsg('비밀번호가 틀렸습니다. 다시 확인해주세요.');
+    // if (response.status === 302) setErrorMsg('비밀번호가 틀렸습니다. 다시 확인해주세요.');
+    // else if (response.data.message === "User Identified") {
+    // else if (response.status === 200) {
+    //   handleIsChange();
+    //   closeModal();
+    // }
   };
 
   return (

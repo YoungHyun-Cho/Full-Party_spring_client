@@ -432,8 +432,8 @@ export default function Mypage() {
     if (isChange) setIsChange(false);
     else {
       setIsInfoLoading(true);
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/profile/${signinReducer.userInfo?.id}`);
-      const userInfo = res.data.userInfo;
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}/details`);
+      const userInfo = res.data;
       setChangeInfo({
         ...changeInfo,
         userName: userInfo.userName,
@@ -744,7 +744,7 @@ export default function Mypage() {
   return (
     <MypageContainer>
       {callModal? <UserCancelModal from={from} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} /> : null}
-      {isVerificationModalOpen? <VerificationModal userId={userInfoFromStore?.id} handleIsChange={handleIsChange} verficationModalHandler={verficationModalHandler} /> : null}
+      {isVerificationModalOpen? <VerificationModal userId={userInfoFromStore?.id} email={userInfoFromStore?.email} handleIsChange={handleIsChange} verficationModalHandler={verficationModalHandler} /> : null}
       {isSearch ?
         <PostCodeModal
           searchHandler={searchHandler}

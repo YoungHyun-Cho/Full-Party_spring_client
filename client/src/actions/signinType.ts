@@ -4,6 +4,7 @@ export const CLOSE_MODAL = 'CLOSE_MODAL';
 
 export type UserInfo = {
   id: any,
+  email: any,
   userName: any,
   profileImage: any,
   address: any,
