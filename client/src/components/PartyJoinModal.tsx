@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom'
+import { Headers, cookieParser } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -93,16 +94,21 @@ export default function PartyJoinModal({ partyJoinModalHandler, userId, partyId 
     partyJoinModalHandler();
   };
 
+  const headers: Headers = {
+    Authorization: "Bearer " + cookieParser()["token"],
+    Refresh: cookieParser()["refresh"]
+  };
+
   const inputHandler = (event: React.ChangeEvent<HTMLTextAreaElement>): void => {
     setMessage(event.target.value);
   };
 
   const joinHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    await axios.post(`${process.env.REACT_APP_API_URL}/party/enqueued`, {
+    await axios.post(`${process.env.REACT_APP_API_URL}/parties/${partyId}/application`, {
       userId,
       partyId,
       message
-    });
+    }, { headers, withCredentials: true }, );
     closeModal();
     navigate(`../party/${partyId}`);
   };

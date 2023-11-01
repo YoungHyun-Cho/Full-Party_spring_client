@@ -8,10 +8,9 @@ import EmptyCard from '../components/EmptyCard';
 import AddressModal from '../components/AddressModal';
 import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { cookieParser, Headers } from "../App";
+import { Headers } from "../App";
 import { AppState } from '../reducers';
 import { NOTIFY } from '../actions/notify';
-import { headers } from '../App'; 
 
 export const ListContainer = styled.div`
   width: 100%;
@@ -34,6 +33,14 @@ export const ListContainer = styled.div`
   }
 `;
 
+const cookieParser = () => {
+  const cookieString = document.cookie.split("; ");
+  const keyAndValue = cookieString.map(item => item.split("="));
+  let cookieObject: { [key: string]: string } = {};
+  keyAndValue.map((item, i) => cookieObject[item[0]] = item[1]);
+  return cookieObject;
+};
+
 export default function List() {
   const dispatch = useDispatch();
 
@@ -48,6 +55,12 @@ export default function List() {
 
   useEffect(() => {
     setIsLoading(true);
+
+    const headers: Headers = {
+      Authorization: "Bearer " + cookieParser()["token"],
+      Refresh: cookieParser()["refresh"]
+    };
+
     (async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/parties?region=${searchRegion}`, {
         withCredentials: true, 

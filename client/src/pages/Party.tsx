@@ -16,7 +16,7 @@ import { AppState } from '../reducers';
 import { NOTIFY } from '../actions/notify';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { cookieParser } from "../App";
+import { cookieParser, Headers } from "../App";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
 import { faArrowLeft, faShareAlt, faComments, faMapMarkerAlt, faCalendarAlt, faHeart,
@@ -275,13 +275,19 @@ export const PartyStateBtns = styled.section`
 `;
 
 export default function Party() {
+
+  const headers: Headers = {
+    Authorization: "Bearer " + cookieParser()["token"],
+    Refresh: cookieParser()["refresh"]
+  };
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const params = useParams();
   const commentRef = useRef<HTMLElement>(null);
 
   const userId = useSelector(
-    (state: AppState) => state.signinReducer.userInfo.id
+    (state: AppState) => state.signinReducer.userInfo.id * 1
   );
 
   const isLoggedIn = cookieParser().isLoggedIn;
@@ -317,9 +323,9 @@ export default function Party() {
     id: 0,
     image: "",
     isOnline: false,
-    leaderId: 0,
+    userId: 0,
     privateLink: "",
-    partyState: 0,
+    partyState: "모집 중",
     region: "",
     location: "",
     coordinates: { lat: 0, lng: 0 },
@@ -410,7 +416,7 @@ export default function Party() {
   };
 
   const shareHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const leader = partyInfo.memberList.filter((member) => member.id === partyInfo.leaderId)[0];
+    const leader = partyInfo.memberList.filter((member) => member.id === partyInfo.userId)[0];
     const hashtags = partyInfo.tags.map((t) => `#${t}`).join(" ");
 
     Kakao.Link.sendDefault({
@@ -467,7 +473,9 @@ export default function Party() {
   };
 
   const cancelHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyInfo.id}/cancel/${userId}`);
+    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/application`, {
+      headers, withCredentials: true
+    });
     const waiterLeft = partyInfo.waiterList.filter((waiter) => waiter.id !== userId);
     setPartyInfo({
       ...partyInfo,
@@ -480,7 +488,7 @@ export default function Party() {
   };
 
   const quitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyInfo.id}/quit/${userId}`);
+    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/participation/${userId}`);
     const memberLeft = partyInfo.memberList.filter((member) => member.id !== userId);
     setPartyInfo({
       ...partyInfo,
@@ -499,7 +507,7 @@ export default function Party() {
     if (res.status === 200) {
       setPartyInfo({
         ...partyInfo,
-        partyState: 1
+        partyState: "모집 완료"
       });
     }
   };
@@ -511,7 +519,7 @@ export default function Party() {
     if (res.status === 200) {
       setPartyInfo({
         ...partyInfo,
-        partyState: 0
+        partyState: "모집 중"
       });
     }
   };
@@ -549,7 +557,7 @@ export default function Party() {
 
   useEffect(() => {
     setIsLoading(true);
-    if (userId === partyInfo.leaderId) {
+    if (userId === partyInfo.userId) {
       setUserState({
         isLeader: true,
         isMember: true,
@@ -571,6 +579,7 @@ export default function Party() {
       });
     };
     setIsLoading(false);
+
   }, [ partyInfo ]);
 
   if (isLoggedIn === "0") return <Navigate to="../" />
@@ -612,17 +621,17 @@ export default function Party() {
           <img src={partyInfo.image} className="thumbnail" alt="thumbnail" />
           <div className="titleContainer">
             <div id="partyState">
-              {partyInfo.partyState === 0 ? 
+              {partyInfo.partyState === "모집 중" ? 
                 <>
                   <FontAwesomeIcon icon={ faBullhorn } /> 모집중 퀘스트
                 </>
               : null}
-              {partyInfo.partyState === 1 ?
+              {partyInfo.partyState === "모집 완료" ?
                 <>
                   <FontAwesomeIcon icon={ faBirthdayCake } /> 진행중 퀘스트
                 </>
               : null}
-              {partyInfo.partyState === 2 ? 
+              {partyInfo.partyState === "퀘스트 완료" ? 
                 <>
                   <FontAwesomeIcon icon={ faCalendarCheck } /> 완료된 퀘스트
                 </>
@@ -711,14 +720,14 @@ export default function Party() {
             <div className="label">파티원 목록</div>
             <MemberList
               from="members"
-              leaderId={partyInfo.leaderId}
+              leaderId={partyInfo.userId}
               members={partyInfo.memberList}
               userInfoModalHandler={userInfoModalHandler}
             />
           </div>
         </MembersContainer>
 
-        {isLeader && partyInfo.partyState <= 0 && partyInfo.memberLimit > partyInfo.memberList.length ? 
+        {isLeader && partyInfo.partyState === "모집 중" && partyInfo.memberLimit > partyInfo.memberList.length ? 
           <MembersContainer>
             <div className="members">
               <div className="label waitingList" onClick={waitingListHandler}>
@@ -727,7 +736,7 @@ export default function Party() {
               {isWaitingListOpen ?
                 <MemberList
                   from="waitingQueue"
-                  leaderId={partyInfo.leaderId}
+                  leaderId={partyInfo.userId}
                   members={partyInfo.waiterList}
                   userInfoModalHandler={userInfoModalHandler}
                 />
@@ -740,7 +749,7 @@ export default function Party() {
           <QnA 
             partyId={partyInfo.id}
             isLeader={isLeader}
-            leaderId={partyInfo.leaderId}
+            leaderId={partyInfo.userId}
             comments={comments.map(comment => comment).reverse()}
             findComment={findComment}
           /> 
@@ -756,7 +765,7 @@ export default function Party() {
             </div>
           : null}
 
-          {isLoggedIn === "1" && !isMember && !isWaiting && partyInfo.partyState <= 0  ? 
+          {isLoggedIn === "1" && !isMember && !isWaiting && partyInfo.partyState === "모집 중"  ? 
             <button onClick={partyJoinModalHandler}>가입 신청</button> 
           : null}
 
@@ -764,26 +773,26 @@ export default function Party() {
             <button onClick={(e) => partyCancelModalHandler(e, "cancel")}>가입 신청 취소</button>
           : null}
 
-          {!isLeader && isMember && partyInfo.partyState === 0 ? 
+          {!isLeader && isMember && partyInfo.partyState === "모집 중" ? 
             <button onClick={(e) => partyCancelModalHandler(e, "quit")}>파티 탈퇴</button> 
           : null}
 
-          {isLeader && partyInfo.partyState === 0 ? 
+          {isLeader && partyInfo.partyState === "모집 중" ? 
             <button onClick={editHandler}>정보 수정</button> 
           : null}
-          {isLeader && partyInfo.partyState === 0 && partyInfo.memberList.length > 1 && partyInfo.memberLimit > partyInfo.memberList.length ? 
+          {isLeader && partyInfo.partyState === "모집 중" && partyInfo.memberList.length > 1 && partyInfo.memberLimit > partyInfo.memberList.length ? 
             <button onClick={(e) => partyCancelModalHandler(e, "fullParty")}>모집 완료</button> 
           : null}
-          {isLeader && partyInfo.partyState === 1 && partyInfo.memberLimit > partyInfo.memberList.length && !partyInfo.isReviewed ? 
+          {isLeader && partyInfo.partyState === "모집 완료" && partyInfo.memberLimit > partyInfo.memberList.length && !partyInfo.isReviewed ? 
             <button onClick={rePartyHandler}>모집 재개</button> 
           : null}
           {isLeader && !partyInfo.isReviewed ? 
             <button onClick={(e) => partyCancelModalHandler(e, "dismiss")}>파티 해산</button>
           : null}
-          {isLeader && ( partyInfo.partyState === 1 || partyInfo.memberLimit === partyInfo.memberList.length ) && !partyInfo.isReviewed? 
+          {isLeader && ( partyInfo.partyState === "모집 완료" || partyInfo.memberLimit === partyInfo.memberList.length ) && !partyInfo.isReviewed? 
             <button id="completeBtn" onClick={reviewModalHandler}>퀘스트 완료</button>
           : null}
-          {isMember && partyInfo.partyState === 2 && !partyInfo.isReviewed ? 
+          {isMember && partyInfo.partyState === "퀘스트 완료" && !partyInfo.isReviewed ? 
             <button id="completeBtn" onClick={reviewModalHandler}>퀘스트 완료</button>
           : null}
         </PartyStateBtns>
@@ -795,7 +804,7 @@ export default function Party() {
           partyId={partyInfo.id}
           partyState={partyInfo.partyState}
           userId={userId}
-          leaderId={partyInfo.leaderId}
+          leaderId={partyInfo.userId}
           isLeader={isLeader}
           isMember={isMember}
           from={from}
@@ -815,7 +824,7 @@ export default function Party() {
         <ReviewModal 
           reviewModalHandler={reviewModalHandler}
           members={partyInfo.memberList.filter((member) => member.id !== userId)}
-          leaderId={partyInfo.leaderId}
+          leaderId={partyInfo.userId}
           isLeader={isLeader}
           userId={userId}
           partyId={partyInfo.id}

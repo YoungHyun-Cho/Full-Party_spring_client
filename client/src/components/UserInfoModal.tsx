@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faFlag, faAward, faCalendarCheck } from '@fortawesome/free-solid-svg-icons';
+import { Headers, cookieParser } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -157,7 +158,7 @@ export const UserStateBtns = styled.section`
 type Props = {
   userInfoModalHandler: Function,
   partyId: number,
-  partyState: number,
+  partyState: string,
   userId: number,
   leaderId: number,
   isLeader: boolean,
@@ -174,6 +175,11 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
   const { id, userName, profileImage, level, message, joinDate } = userInfo;
   const [ isEditMode, setIsEditMode ] = useState(false);
   const [ newMsg, setNewMsg ] = useState(message);
+
+  const headers: Headers = {
+    Authorization: "Bearer " + cookieParser()["token"],
+    Refresh: cookieParser()["refresh"]
+  };
 
   const formatDate = (date: String) => date.slice(0, 10);
 
@@ -199,7 +205,8 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
   };
 
   const expelHandler = async () => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyId}/expel/${userInfo.id}`);
+    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyId}/participation/${userInfo.id}`, 
+    { headers, withCredentials: true });
     navigate(`../party/${partyId}`);
   };
 
@@ -209,9 +216,11 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
   };
 
   const acceptHandler = async () => {
-    await axios.post(`${process.env.REACT_APP_API_URL}/party/approval`, {
-      userId: userInfo.id, partyId
-      }, { withCredentials: true });
+    console.log(userId)
+    await axios.post(`${process.env.REACT_APP_API_URL}/parties/${partyId}/participation`, 
+      { userId: userInfo.id }, 
+      { headers, withCredentials: true }
+    );
     navigate(`../party/${partyId}`);
   }
 
@@ -263,7 +272,7 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
             {id === userId && isEditMode ? 
               <button onClick={editConfirmHandler}>변경 사항 적용</button> 
             : null}
-            {isLeader && id !== userId && from === "members" && partyState < 2 ? 
+            {isLeader && id !== userId && from === "members" && (partyState === "모집 중" || partyState === "모집 완료") ? 
               <button onClick={expelHandler}>파티원 퇴출</button> 
             : null} 
             {isLeader && from === "waitingQueue" ? 
