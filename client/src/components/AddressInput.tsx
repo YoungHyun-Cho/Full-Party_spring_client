@@ -130,7 +130,7 @@ const AddressInput = ({ partyInfo, handleCoordsChange, handleLocationChange, han
           <div className='mapContainer'>
             <div id='map' className='mapDesc'>
               <PostMap 
-                latlng={partyInfo.latlng}
+                coordinates={partyInfo.coordinates}
                 location={partyInfo.location} 
                 name={partyInfo.name}
                 image={partyInfo.image} 

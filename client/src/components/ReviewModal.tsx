@@ -9,6 +9,7 @@ import { faSadCry, faSadTear, faSmile, faGrinWink, faLaughBeam } from '@fortawes
 import { faSadCry as blankSadCry, faSadTear as blankSadTear, faSmile as blankSmile,
   faGrinWink as blankGrinWink, faLaughBeam as blankLaughBeam
 } from '@fortawesome/free-regular-svg-icons';
+import { Headers, cookieParser } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -200,6 +201,11 @@ export default function ReviewModal({ reviewModalHandler, members, leaderId, isL
 
   const memberToReview = reviewMembers.filter((member) => member.exp === null).length;
 
+  const headers: Headers = {
+    Authorization: "Bearer " + cookieParser()["token"],
+    Refresh: cookieParser()["refresh"]
+  };
+
   const closeModal =() => {
     reviewModalHandler();
   };
@@ -217,18 +223,19 @@ export default function ReviewModal({ reviewModalHandler, members, leaderId, isL
   };
 
   const questCompleteHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    const reviewedMembers = reviewMembers.map((member) => ({ userId: member.id, exp: member.exp}));
+    const reviewedMembers = reviewMembers.map(member => ({ userId: member.id, exp: member.exp}));
+
     if (isLeader) {
-      await axios.patch(`${process.env.REACT_APP_API_URL}/party/completed`, {
-        partyId
+      await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyId}/states`, {
+        partyState: "퀘스트 완료"
       }, { withCredentials: true });
       handlePartyInfoChange("partyState", 2);
     }
-    await axios.patch(`${process.env.REACT_APP_API_URL}/party/review`, {
-      partyId,
-      userId,
-      exp: reviewedMembers,
-    }, { withCredentials: true });
+    
+    console.log(reviewedMembers);
+    await axios.post(`${process.env.REACT_APP_API_URL}/parties/${partyId}/review`, 
+    { result: reviewedMembers }, 
+    { headers, withCredentials: true });
     handlePartyInfoChange("isReviewed", true);
     confetti();
     reviewModalHandler();

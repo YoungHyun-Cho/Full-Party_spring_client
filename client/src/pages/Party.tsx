@@ -500,10 +500,25 @@ export default function Party() {
     });
   };
 
+  // const partyStateHandler = async (event: React.MouseEvent<HTMLButtonElement>, state: string) => {
+
+  //   const res = await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/states`, 
+  //   { partyState: "모집 완료" }, 
+  //   { headers, withCredentials: true });
+  //   console.log(res);
+  //   if (res.status === 200) {
+  //     setPartyInfo({
+  //       ...partyInfo,
+  //       partyState: "모집 완료"
+  //     });
+  //   }
+  // };
+
   const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/fullParty`, {
-      partyId: partyInfo.id
-    });
+    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/states`, 
+    { partyState: "모집 완료" }, 
+    { headers, withCredentials: true });
+    console.log(res);
     if (res.status === 200) {
       setPartyInfo({
         ...partyInfo,
@@ -513,9 +528,8 @@ export default function Party() {
   };
 
   const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/reParty`, {
-      partyId: partyInfo.id
-    });
+    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/states`, 
+    { partyState: "모집 중" });
     if (res.status === 200) {
       setPartyInfo({
         ...partyInfo,
@@ -525,7 +539,7 @@ export default function Party() {
   };
 
   const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/party/${partyInfo.id}`);
+    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}`);
     navigate('../home');
   };
 

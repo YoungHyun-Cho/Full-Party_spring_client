@@ -576,7 +576,7 @@ export default function PartyEdit({ party, editHandler, handleOnOff }: Props) {
   const [ isLocation, setIsLocation ] = useState({ err: false, msg: '' });
 
   const [ partyInfo, setPartyInfo ] = useState(party);
-  const [ tags, setTags ] = useState<string[]>(partyInfo.tag);
+  const [ tags, setTags ] = useState<string[]>(partyInfo.tags);
   const [ inputTxt, setInputTxt ] = useState('');
 
   const [ isPosted, setIsPosted ] = useState(false);
@@ -595,7 +595,7 @@ export default function PartyEdit({ party, editHandler, handleOnOff }: Props) {
     const code = String(Math.floor(Math.random()*1000000)).padStart(8, "0");
     const upload = new AWS.S3.ManagedUpload({
       params: {
-        Bucket: "teo-img",
+        Bucket: "fullpartyspringimageserver",
         Key: `${signinReducer.userInfo.id}_${code}_edit_image`,
         Body: file,
       }
@@ -683,7 +683,7 @@ export default function PartyEdit({ party, editHandler, handleOnOff }: Props) {
   const handleCoordsChange = (lat: number, lng: number) => {
     setPartyInfo({
       ...partyInfo,
-      latlng: { lat: lat, lng: lng }
+      coordinates: { lat: lat, lng: lng }
     });
   };
 
@@ -784,26 +784,28 @@ export default function PartyEdit({ party, editHandler, handleOnOff }: Props) {
   }
 
   const patchParty = async () => {
-    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/edit/${partyInfo.id}`, {
-      userId: signinReducer.userInfo?.id,
-      partyId: partyInfo.id,
-      partyInfo: {
-        name: partyInfo.name,
-        image: partyInfo.image,
-        memberLimit: partyInfo.memberLimit,
-        region:
-          party.isOnline ?
-          signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
-          : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
-        location: partyInfo.location,
-        latlng: party.isOnline ? { lat: 0, lng: 0 } : partyInfo.latlng,
-        startDate: partyInfo.startDate,
-        endDate: partyInfo.endDate,
-        isOnline: party.isOnline,
-        privateLink: partyInfo.privateLink,
-        tag: tags
-      }
+    console.log(signinReducer.userInfo.id);
+    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}`, {
+      userId: signinReducer.userInfo.id,
+      id: partyInfo.id,
+      name: partyInfo.name,
+      image: partyInfo.image,
+      memberLimit: partyInfo.memberLimit,
+      content: partyInfo.content,
+      region:
+        party.isOnline ?
+        signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
+        : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
+      location: partyInfo.location,
+      coordinates: party.isOnline ? { lat: 0, lng: 0 } : partyInfo.coordinates,
+      startDate: partyInfo.startDate,
+      endDate: partyInfo.endDate,
+      isOnline: party.isOnline,
+      privateLink: partyInfo.privateLink,
+      partyState: partyInfo.partyState,
+      tags: tags
     }, { withCredentials: true });
+    console.log(res);
     return res;
   }
 
@@ -817,7 +819,7 @@ export default function PartyEdit({ party, editHandler, handleOnOff }: Props) {
       .then((res) => {
         setIsPosted(false);
         editHandler();
-        navigate(`../party/${res.data.partyInfo.partyId}`);
+        navigate(`../party/${res.data.id}`);
       })
       .catch((err) => {
         setIsErrorModalOpen(true);
@@ -856,9 +858,7 @@ export default function PartyEdit({ party, editHandler, handleOnOff }: Props) {
             {imgLoading ? <Loading /> :
             <>
               <img className="preview" src={partyInfo.image} alt="thumbnail"
-                onError={() => {
-                  return (imgRef.current.src = 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png')
-                }}
+                onError={() => imgRef.current ? (imgRef.current.src = 'https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png') : imgRef.current}
               />
               <input 
                 ref={fileRef}

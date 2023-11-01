@@ -69,16 +69,16 @@ export const MapContainer = styled.div`
 `;
 
 type Props = {
-  latlng: { lat: number, lng: number },
+  coordinates: { lat: number, lng: number },
   location: string,
   name: string,
   image: string,
   handleCoordsChange: Function
 };
 
-export default function PostMap({ latlng, location, name, image, handleCoordsChange }: Props) {
+export default function PostMap({ coordinates: coordinates, location, name, image, handleCoordsChange }: Props) {
   const { kakao } = window;
-  const [ coords, setCoords ] = useState(latlng.lat === 0 ? { lat: 37.496562, lng: 127.024761 } : latlng);
+  const [ coords, setCoords ] = useState(coordinates.lat === 0 ? { lat: 37.496562, lng: 127.024761 } : coordinates);
   const { lat, lng } = coords;
   const geocoder = new kakao.maps.services.Geocoder();
 
@@ -90,6 +90,7 @@ export default function PostMap({ latlng, location, name, image, handleCoordsCha
           const { La, Ma } = coordinates;
           setCoords({ lat: Ma, lng: La });
           handleCoordsChange(Ma, La);
+          // console.log(Ma, La);
         }
       });
     }
