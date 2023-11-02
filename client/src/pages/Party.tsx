@@ -319,7 +319,7 @@ export default function Party() {
     startDate: "",
     endDate: "",
     content: "",
-    favorite: 0,
+    heartCount: 0,
     id: 0,
     image: "",
     isOnline: false,
@@ -394,22 +394,29 @@ export default function Party() {
   };
 
   const favoriteHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    await axios.post(`${process.env.REACT_APP_API_URL}/favorite/${partyInfo.id}`, {
-      userId, partyId: partyInfo.id
-     }, {
-      withCredentials: true
-    });
+    
     if (partyInfo.isHeart) {
+
+      await axios.delete(`${process.env.REACT_APP_API_URL}/hearts/${partyInfo.id}`, 
+        { headers, withCredentials: true }
+      );
+      
       setPartyInfo({
         ...partyInfo,
-        favorite: partyInfo.favorite - 1,
+        heartCount: partyInfo.heartCount - 1,
         isHeart: false,
       });
     }
     else {
+
+      await axios.post(`${process.env.REACT_APP_API_URL}/hearts/${partyInfo.id}`, 
+        {}, 
+        { headers, withCredentials: true }
+      );
+
       setPartyInfo({
         ...partyInfo,
-        favorite: partyInfo.favorite + 1,
+        heartCount: partyInfo.heartCount + 1,
         isHeart: true,
       });
     }
@@ -435,7 +442,7 @@ export default function Party() {
         },
       },
       social: {
-        likeCount: partyInfo.favorite,
+        likeCount: partyInfo.heartCount,
         subscriberCount: partyInfo.memberList.length
       },
       buttonTitle: '퀘스트 참여하기'
@@ -547,7 +554,8 @@ export default function Party() {
     setIsUserInfoModalOpen(false);
     setIsLoading(true);
     if (params.commentId) setFindComment(Number(params.commentId));
-    axios.get(`${process.env.REACT_APP_API_URL}/parties/${params.partyId}`)
+    axios.get(`${process.env.REACT_APP_API_URL}/parties/${params.partyId}`, 
+    { headers, withCredentials: true })
     .then(res => {
       console.log(res);
       setPartyInfo({ ...res.data });
@@ -674,7 +682,7 @@ export default function Party() {
               icon={partyInfo.isHeart ? faHeart : blankFaHeart}
               className="favorite" 
             />
-            &nbsp;{ partyInfo.favorite }
+            &nbsp;{ partyInfo.heartCount }
           </button>
           <div className="tagContainer">
             { partyInfo.tags.map((t, idx) => 

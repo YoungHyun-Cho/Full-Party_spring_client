@@ -3,11 +3,11 @@ import axios from 'axios';
 import styled from 'styled-components';
 import Loading from '../components/Loading';
 import QuestCard from '../components/QuestCard';
-import { cookieParser } from "../App"
 import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../reducers';
 import { NOTIFY } from "../actions/notify"
+import { Headers, cookieParser } from '../App';
 
 export const FavoriteContainer = styled.div`
   width: 100%;
@@ -37,21 +37,27 @@ export default function Favorite() {
     (state: AppState) => state.signinReducer.userInfo.id
   );
 
+  const headers: Headers = {
+    Authorization: "Bearer " + cookieParser()["token"],
+    Refresh: cookieParser()["refresh"]
+  };
+
   const [ isLoading, setIsLoading ] = useState(true);
   const [ favoriteList, setFavoriteList ] = useState<Array<Object>>([]);
 
   useEffect(() => {
     (async () => {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/favorite/${userId}`, {
-        withCredentials: true
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/hearts`, {
+        headers, withCredentials: true
       });
+      console.log(response);
       dispatch({
         type: NOTIFY,
         payload: {
           isBadgeOn: response.data.notification
         }
       });
-      setFavoriteList(response.data.partyList);
+      setFavoriteList(response.data.parties);
     })();
   }, [ userInfo ]);
 

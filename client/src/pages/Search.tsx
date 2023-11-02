@@ -5,7 +5,7 @@ import LocalQuest from '../components/LocalQuest';
 import EmptyCard from '../components/EmptyCard';
 import Loading from '../components/Loading';
 import { useDispatch } from 'react-redux';
-import { cookieParser } from "../App";
+import { Headers, cookieParser } from "../App";
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -104,6 +104,12 @@ export const SearchContent = styled.div`
 `;
 
 export default function Search() {
+
+  const headers: Headers = {
+    Authorization: "Bearer " + cookieParser()["token"],
+    Refresh: cookieParser()["refresh"]
+  };
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const params = useParams();
@@ -115,7 +121,8 @@ export default function Search() {
     (state: AppState) => state.signinReducer.userInfo?.id
   );
 
-  const userAddress = signinReducer.userInfo?.address;
+  // const userAddress = signinReducer.userInfo?.address;
+  const userAddress = sessionStorage.getItem("address") || "";
   const searchRegion = userAddress.split(" ")[0] + " " + userAddress.split(" ")[1];
 
   const [ word, setWord ] = useState<string | undefined>('');
@@ -138,9 +145,11 @@ export default function Search() {
     if (params.tag) {
       const tag = params.tag;
       const searchData = async () => {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?tagName=${tag}&region=${searchRegion}&userId=${userId}`);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search/tag?value=${tag}&region=${searchRegion}`,
+        { headers, withCredentials: true } );
         const partyData = res.data.result;
-        const parsedData = partyData.map((party: any) => ({ ...party, "latlng": JSON.parse(party.latlng) }));
+        console.log(res);
+        // const parsedData = partyData.map((party: any) => ({ ...party, "latlng": JSON.parse(party.latlng) }));
         dispatch({
           type: NOTIFY,
           payload: {
@@ -149,7 +158,7 @@ export default function Search() {
         });
         if (isComponentMounted) {
           setWord(tag);
-          setParties(parsedData);
+          setParties(partyData);
         }
       }
       searchData();
@@ -157,9 +166,11 @@ export default function Search() {
     else if (params.keyword) {
       const keyword = params.keyword;
       const searchData = async () => {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?keyword=${keyword}&region=${searchRegion}&userId=${userId}`);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search/keyword?value=${keyword}&region=${searchRegion}`,
+        { headers, withCredentials: true });
+        console.log(res);
         const partyData = res.data.result;
-        const parsedData = partyData.map((party: any) => ({ ...party, latlng: JSON.parse(party.latlng) }));
+        // const parsedData = partyData.map((party: any) => ({ ...party, latlng: JSON.parse(party.latlng) }));
         dispatch({
           type: NOTIFY,
           payload: {
@@ -168,7 +179,7 @@ export default function Search() {
         });
         if (isComponentMounted) {
           setWord(keyword);
-          setParties(parsedData);
+          setParties(partyData);
         }
       }
       searchData();

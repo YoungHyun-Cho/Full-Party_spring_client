@@ -571,16 +571,13 @@ export default function Mypage() {
         mobileMsg: '',
         axiosMsg: '',
       });
-      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/profile`, {
-        userInfo: {
-          userId: signinReducer.userInfo?.id,
-          profileImage,
-          userName,
-          birth,
-          gender,
-          address,
-          mobile
-        }
+      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}`, {
+        profileImage,
+        userName,
+        birth,
+        gender,
+        address,
+        mobile
       });
       if (res.status === 200) {
         setIsChange(false);
@@ -596,17 +593,14 @@ export default function Mypage() {
       }
     }
     else if (password !== '') {
-      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/profile`, {
-        userInfo: {
-          userId: signinReducer.userInfo?.id,
-          profileImage,
-          userName,
-          password: nowPwd,
-          birth,
-          gender,
-          address,
-          mobile
-        }
+      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}`, {
+        profileImage,
+        userName,
+        password: nowPwd,
+        birth,
+        gender,
+        address,
+        mobile
       });
       if (res.status === 200) {
         setIsChange(false);

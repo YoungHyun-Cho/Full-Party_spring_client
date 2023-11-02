@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faMapMarkerAlt, faCalendarAlt, faGlobe, faExclamation } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
 import { useSelector } from 'react-redux';
+import { Headers, cookieParser } from '../App';
 
 export const QuestCardContainer = styled.div`
   width: 100%;
@@ -157,23 +158,37 @@ type Props = {
 
 export default function QuestCard ({ party }: Props) {
   const navigate = useNavigate();
-  const { id, name, memberLimit, startDate, endDate, leaderId, favorite, tags, isOnline, region, memberList } = party;
+  const { id, name, memberLimit, startDate, endDate, leaderId, isHeart, tags, isOnline, region, memberList } = party;
+
+  const headers: Headers = {
+    Authorization: "Bearer " + cookieParser()["token"],
+    Refresh: cookieParser()["refresh"]
+  };
 
   const userId = useSelector(
     (state: AppState) => state.signinReducer.userInfo.id
   );
 
-  const [ like, setLike ] = useState(favorite);
+  const [ like, setLike ] = useState(isHeart);
 
   const formatDate = (date: Date) => String(date).slice(0, 11);
 
   const favoriteHandler = async (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/favorite/${id}`, { userId, partyId: id }, {
-      withCredentials: true
-    });
-    if (response.data.message === "Like Selected") setLike(true);
-    else if (response.data.message === "Like Canceled") setLike(false);
+    if (!like) {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/hearts/${id}`, 
+        {}, 
+        { headers, withCredentials: true }
+      );
+      if (response.status === 201) setLike(true); // 수정 필요
+    }
+    else {
+      const response = await axios.delete(`${process.env.REACT_APP_API_URL}/hearts/${id}`, 
+        { headers, withCredentials: true }
+      );
+      if (response.status === 204) setLike(false); // 수정 필요
+    }
+    
   };
 
   return (

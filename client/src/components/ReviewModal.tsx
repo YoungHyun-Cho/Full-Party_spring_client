@@ -234,7 +234,7 @@ export default function ReviewModal({ reviewModalHandler, members, leaderId, isL
     
     console.log(reviewedMembers);
     await axios.post(`${process.env.REACT_APP_API_URL}/parties/${partyId}/review`, 
-    { result: reviewedMembers }, 
+    { results: reviewedMembers }, 
     { headers, withCredentials: true });
     handlePartyInfoChange("isReviewed", true);
     confetti();
