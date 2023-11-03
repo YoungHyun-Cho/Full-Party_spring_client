@@ -412,16 +412,20 @@ export default function SignupModal() {
   const searchHandler = (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => setIsSearch(!isSearch);
 
   const mailVerification = async () => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification`, {
-      email: userInfo.email
-    }, { withCredentials: true });
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mails/verification`, {
+      email: userInfo.email }
+    );
+    // }, { withCredentials: true });
+    console.log(res);
     setIsSent(true);
     setVerificationData({ email: userInfo.email, code: res.data.code });
     setTimeout(handleCodeExpire, 1000 * 60 * 5);
   };
 
   const codeVerification = () => {
-    if (userInfo.email === verificationData.email && verificationData.code === inputCode) {
+
+    // if (userInfo.email === verificationData.email && verificationData.code === inputCode) {
+    if (verificationData.code + "" === inputCode + "") {
       setPageIdx(pageIdx + 1);
       setIsError({
         ...isError,
@@ -458,6 +462,8 @@ export default function SignupModal() {
   };
 
   const handleSignup = () => {
+
+    console.log(userInfo);
     const { profileImage, email, password, name, gender, birth, mobile, address } = userInfo;
     const { isEmail, isName, isGender, isBirth, isMobile } = isError;
 
@@ -477,17 +483,15 @@ export default function SignupModal() {
     }
     else {
       setIsRequested(true);
-      axios.post(`${process.env.REACT_APP_API_URL}/signup`,{
-        userInfo: {
-          userName: name,
-          profileImage,
-          email,
-          password,
-          birth,
-          gender,
-          mobile,
-          address
-        }
+      axios.post(`${process.env.REACT_APP_API_URL}/users`,{
+        userName: name,
+        profileImage,
+        email,
+        password,
+        birth,
+        gender,
+        mobile,
+        address
       }, { withCredentials: true })
       .then((res) => {
         if (res.data.message === 'Already Signed Up') {
