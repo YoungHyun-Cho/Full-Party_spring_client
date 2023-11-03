@@ -8,7 +8,7 @@ import EmptyCard from '../components/EmptyCard';
 import AddressModal from '../components/AddressModal';
 import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Headers } from "../App";
+import { Headers, HttpMethod, sendRequest } from "../App";
 import { AppState } from '../reducers';
 import { NOTIFY } from '../actions/notify';
 
@@ -62,10 +62,16 @@ export default function List() {
     };
 
     (async () => {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/parties?region=${searchRegion}`, {
-        withCredentials: true, 
-        headers
-      });
+      // const response = await axios.get(`${process.env.REACT_APP_API_URL}/parties?region=${searchRegion}`, {
+      //   withCredentials: true, 
+      //   headers
+      // });
+
+      const response = await sendRequest(
+        HttpMethod.GET, 
+        `${process.env.REACT_APP_API_URL}/parties?region=${searchRegion}`,
+        null
+      );
       console.log(response.data);
       dispatch({
         type: NOTIFY,

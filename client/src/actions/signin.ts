@@ -26,7 +26,7 @@ export const fetchUserdata = (userInfo: UserInfo) => async (dispatch: Dispatch<U
       headers.Refresh = res.headers['refresh'];
 
       // document.cookie = `token=${res.headers['authorization']}`; // -> 쿠키에 토큰 저장 완료..
-      // document.cookie = `refresh=${res.headers['refresh']}`;
+      // document.cookie = `refresh=${res.headers['refresh']}`; // 서버에서 setCookie 해줌 -> 여기서 할 필요 없음. 
 
       sessionStorage.setItem("id", res.data.id);
       sessionStorage.setItem("email", userInfo.email);

@@ -1,6 +1,6 @@
 import './App.css';
 import React, { useEffect, Fragment } from 'react';
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import Home from './pages/Home';
 import List from './pages/List';
 import Party from './pages/Party';
@@ -23,6 +23,7 @@ import { RootReducerType } from './store/store';
 import { SIGNIN_SUCCESS } from './actions/signinType';
 import dotenv from "dotenv";
 import { fetchUserdata } from './actions/signin';
+import { bool } from 'aws-sdk/clients/signer';
 
 declare global {
   interface Window {
@@ -44,6 +45,12 @@ export type Headers = {
   Refresh?: string;
 }
 
+export type Header = {
+  Authorization?: string;
+  Refresh?: string;
+  withCredentials: boolean;
+}
+
 export const requestKeepLoggedIn = async (token: string, signupType: string) => {
   // const response = await axios.post(`${process.env.REACT_APP_API_URL}/keeping`, {}, {
   //   headers: {
@@ -54,9 +61,81 @@ export const requestKeepLoggedIn = async (token: string, signupType: string) => 
   // return response;
 };
 
-export const headers: Headers = {
-  Authorization: "Bearer " + cookieParser()["token"],
-  Refresh: cookieParser()["refresh"]
+// export const headers: Header = {
+//   Authorization: "Bearer " + cookieParser()["token"],
+//   Refresh: cookieParser()["refresh"],
+//   withCredentials: true
+// };
+
+export enum HttpMethod {
+  POST,
+  PATCH, 
+  GET, 
+  DELETE
+}
+
+// export const checkResponse = async (res: AxiosResponse, ) => {
+//   if (res.status === 401) {
+//     const res2 = await axios.post(`${process.env.REACT_APP_API_URL}/auth/refresh`);
+//     if (res2.status === 200) return true;
+//     else return false;
+//   }
+//   else return true;
+// };
+
+export const getHeaders = () => {
+
+  const headers = { 
+    Authorization: "Bearer " + cookieParser()["token"],
+    Refresh: cookieParser()["refresh"]
+  };
+  
+  return { headers, withCredentials: true };
+}; 
+
+export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any): Promise<any> => {
+
+  let response;
+  const headers = getHeaders();
+
+  // switch (httpMethod) {
+  //   case HttpMethod.POST:   response = await axios.post(url, body, headers); break;
+  //   case HttpMethod.PATCH:  response = await axios.patch(url, body, headers); break;
+  //   case HttpMethod.GET:    response = await axios.get(url, headers); break;
+  //   case HttpMethod.DELETE: response = await axios.delete(url, headers); break;
+  // }
+
+  // console.log(response);
+
+  // if (response.status === 401) {
+  //   const refreshResult = await axios.get(`${process.env.REACT_APP_API_URL}/auth/refresh`, headers);
+  //   if (refreshResult.status === 200) {
+  //     return await sendRequest(httpMethod, url, body);
+  //   }
+  //   else console.log(refreshResult);
+  // }
+
+  // return response;
+
+  try {
+    switch (httpMethod) {
+      case HttpMethod.POST:   response = await axios.post(url, body, headers); break;
+      case HttpMethod.PATCH:  response = await axios.patch(url, body, headers); break;
+      case HttpMethod.GET:    response = await axios.get(url, headers); break;
+      case HttpMethod.DELETE: response = await axios.delete(url, headers); break;
+    }
+
+    if (response.status === 401) throw new Error();
+  }
+  catch(error) {
+    const refreshResult = await axios.get(`${process.env.REACT_APP_API_URL}/auth/refresh`, headers);
+    if (refreshResult.status === 200) return await sendRequest(httpMethod, url, body);
+    else console.log(refreshResult);
+  }
+
+  console.log(response);
+
+  return response;
 };
 
 export const IMAGE_SERVER_URL="https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com";
@@ -95,8 +174,8 @@ export default function App() {
       });
       // });
 
-      headers.Authorization = "Bearer " + cookieParser()["token"];
-      headers.Refresh = cookieParser()["refresh"];
+      // headers.Authorization = "Bearer " + cookieParser()["token"];
+      // headers.Refresh = cookieParser()["refresh"];
     }
   }, []);
 

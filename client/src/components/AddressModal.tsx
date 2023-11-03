@@ -9,6 +9,7 @@ import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
 import { useDispatch, useSelector } from 'react-redux';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
+import { HttpMethod, sendRequest } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -171,9 +172,13 @@ export default function  AddressModal() {
   const handleAddressRegister = async () => {
     if (address) {
       setErrorMsg('');
+      
       const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/address/${userInfo.id}`, {
         userId: userInfo.id, address
       });
+
+      // const res = sendRequest(HttpMethod.PATCH, `${process.env.REACT_APP_API_URL}/user/address/${userInfo.id}`);
+
       if (res.status === 200) {
         dispatch({
           type: SIGNIN_SUCCESS,

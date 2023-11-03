@@ -10,7 +10,7 @@ import PostCodeModal from '../components/PostCodeModal';
 import EmptyParty from '../components/EmptyParty';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { cookieParser, headers, IMAGE_SERVER_URL } from "../App";
+import { cookieParser, Headers, IMAGE_SERVER_URL } from "../App";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { NOTIFY } from "../actions/notify";
@@ -295,6 +295,13 @@ export const MypartyCards = styled.section`
 `;
 
 export default function Mypage() {
+
+  const headers: Headers = {
+    Authorization: "Bearer " + cookieParser()["token"],
+    Refresh: cookieParser()["refresh"],
+  };
+
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const fileRef = useRef<any>();

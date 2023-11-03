@@ -624,7 +624,7 @@ export default function Post() {
   );
 
   const headers: Headers = {
-    Authorization: cookieParser()["token"],
+    Authorization: "Bearer " + cookieParser()["token"],
     Refresh: cookieParser()["refresh"]
   };
 
@@ -642,7 +642,7 @@ export default function Post() {
     endDate: '',
     memberLimit: 2,
     location: '',
-    latlng: { lat: 0, lng: 0 },
+    coordinates: { lat: 0, lng: 0 },
     privateLink: '',
     content: ''
   });
@@ -784,7 +784,7 @@ export default function Post() {
   const handleCoordsChange = (lat: number, lng: number) => {
     setPartyInfo({
       ...partyInfo,
-      latlng: { lat: lat, lng: lng }
+      coordinates: { lat: lat, lng: lng }
     });
   };
 
@@ -945,14 +945,14 @@ export default function Post() {
         signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
         : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
       location: partyInfo.location,
-      coordinates: isOnline? {lat: 0, lng: 0} : partyInfo.latlng,
+      coordinates: isOnline? {lat: 0, lng: 0} : partyInfo.coordinates,
       startDate: partyInfo.startDate,
       endDate: partyInfo.endDate,
       isOnline: isOnline,
       privateLink: partyInfo.privateLink,
       tags
     }, {
-      headers
+      headers, withCredentials: true
     });
     return res;
   }
