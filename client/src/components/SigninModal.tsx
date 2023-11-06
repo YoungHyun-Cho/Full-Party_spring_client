@@ -10,6 +10,7 @@ import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
 import { CLOSE_MODAL } from '../actions/modalType';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
+import { HttpMethod, sendRequest } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -211,9 +212,17 @@ export default function SigninModal() {
     dispatch(modalChanger(e.currentTarget.className))
   };
 
-  const googleLoginHandler = () => {
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`;
-    window.location.assign(url);
+  const googleLoginHandler = async () => {
+    // const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`;
+    // window.location.assign(url);
+
+    // const response = await axios.get(
+    //   "https://localhost:8080/oauth2/authorization/google"
+    // );
+
+    window.location.href = "https://localhost:8080/oauth2/authorization/google";
+
+    // console.log(response);
   };
 
   const kakaoLoginHandler = () => {

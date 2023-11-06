@@ -48,7 +48,6 @@ export default function List() {
     (state: AppState) => state.signinReducer.userInfo
   );
 
-  const searchRegion = userInfo.address.split(" ")[0] + " " + userInfo.address.split(" ")[1];
   const [ isLoading, setIsLoading ] = useState(true);
   const [ myParties, setMyParties ] = useState([]);
   const [ localParties, setLocalParties ] = useState([]);
@@ -60,6 +59,9 @@ export default function List() {
       Authorization: "Bearer " + cookieParser()["token"],
       Refresh: cookieParser()["refresh"]
     };
+
+    console.log(userInfo.address);
+    const searchRegion = userInfo.address.split(" ")[0] + " " + userInfo.address.split(" ")[1];
 
     (async () => {
       // const response = await axios.get(`${process.env.REACT_APP_API_URL}/parties?region=${searchRegion}`, {
@@ -95,7 +97,7 @@ export default function List() {
 
   if (isLoading) return <Loading />
 
-  if (!userInfo.address || userInfo.address === 'Guest' || userInfo.address === "Google" || userInfo.address === "Kakao")
+  if (userInfo.address.isNull() || !userInfo.address || userInfo.address === 'Guest' || userInfo.address === "Google" || userInfo.address === "Kakao")
     return <AddressModal />
 
   if (cookieParser().isLoggedIn === "0") return <Navigate to="../" />

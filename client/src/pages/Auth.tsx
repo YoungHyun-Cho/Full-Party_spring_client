@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { useDispatch } from 'react-redux';
-import { cookieParser } from '../App';
+import { HttpMethod, cookieParser, sendRequest } from '../App';
 
 export const LoadingContainer = styled.div`
   width: 100vw;
@@ -48,22 +48,45 @@ export default function Auth() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const address = new URL(window.location.href).searchParams.get("code");
-    if (address && address[1] !== "/") handleKakaoLogin();
-    else if (address && address[1] === "/") handleGoogleLogin();
+    // const address = new URL(window.location.href).searchParams.get("code");
+    // if (address && address[1] !== "/") handleKakaoLogin();
+    // else if (address && address[1] === "/") handleGoogleLogin();
+
+    const signUpType = new URL(window.location.href).searchParams.get("sign_up_by");
+
+    if (signUpType === "google") handleGoogleLogin();
   }, []);
 
   const handleGoogleLogin = async () => {
-    const authorizationCode = new URL(window.location.href).searchParams.get("code");
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/google`, {
-      authorizationCode
-    }, { withCredentials: true });
-    dispatch({
-      type: SIGNIN_SUCCESS,
-      payload: response.data.userInfo
-    });
+    // const authorizationCode = new URL(window.location.href).searchParams.get("code");
+    // const response = await axios.post(`${process.env.REACT_APP_API_URL}/google`, {
+    //   authorizationCode
+    // }, { withCredentials: true });
+    // dispatch({
+    //   type: SIGNIN_SUCCESS,
+    //   payload: response.data.userInfo
+    // });
+
+    const accessToken = new URL(window.location.href).searchParams.get("access_token");
+    const refreshToken = new URL(window.location.href).searchParams.get("refresh_token");
+    const userId = new URL(window.location.href).searchParams.get("user_id");
+
     document.cookie = `signupType=google; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `token=${accessToken}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `refresh=${refreshToken}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+
+    const response = await sendRequest(
+      HttpMethod.GET,
+      `${process.env.REACT_APP_API_URL}/users/${userId}`,
+      null
+    );
+ 
+    dispatch({
+      type: SIGNIN_SUCCESS,
+      payload: response.data
+    });
+
     navigate("../home");
   };
 

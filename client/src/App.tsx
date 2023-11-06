@@ -98,25 +98,6 @@ export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any
   let response;
   const headers = getHeaders();
 
-  // switch (httpMethod) {
-  //   case HttpMethod.POST:   response = await axios.post(url, body, headers); break;
-  //   case HttpMethod.PATCH:  response = await axios.patch(url, body, headers); break;
-  //   case HttpMethod.GET:    response = await axios.get(url, headers); break;
-  //   case HttpMethod.DELETE: response = await axios.delete(url, headers); break;
-  // }
-
-  // console.log(response);
-
-  // if (response.status === 401) {
-  //   const refreshResult = await axios.get(`${process.env.REACT_APP_API_URL}/auth/refresh`, headers);
-  //   if (refreshResult.status === 200) {
-  //     return await sendRequest(httpMethod, url, body);
-  //   }
-  //   else console.log(refreshResult);
-  // }
-
-  // return response;
-
   try {
     switch (httpMethod) {
       case HttpMethod.POST:   response = await axios.post(url, body, headers); break;
