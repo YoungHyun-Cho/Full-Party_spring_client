@@ -93,6 +93,30 @@ export const getHeaders = () => {
   return { headers, withCredentials: true };
 }; 
 
+export const checkValue = (name: string, value: any) => {
+  return value === null || value === undefined ? sessionStorage.getItem(name) : value;
+};
+
+export const setSessionStorage = ({ id, email, userName, profileImage, address }: any) => {
+
+  sessionStorage.setItem("id", checkValue("id", id));
+  sessionStorage.setItem("email", checkValue("email", email));
+  sessionStorage.setItem("userName", checkValue("userName", userName));
+  sessionStorage.setItem("profileImage", checkValue("profileImage", profileImage));
+  sessionStorage.setItem("address", checkValue("address", address));
+};
+
+export const setEachCookie = (name: string, value: any) => {
+    document.cookie = `${name}=${value}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+};
+
+export const setAllCookie = (signUpType: string, isLoggedIn: string, accessToken: string, refreshToken: string) => {
+  setEachCookie("token", accessToken);
+  setEachCookie("refresh", refreshToken);
+  setEachCookie("signupType", signUpType);
+  setEachCookie("isLoggedIn", isLoggedIn);
+};
+
 export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any): Promise<any> => {
 
   let response;
@@ -113,8 +137,6 @@ export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any
     if (refreshResult.status === 200) return await sendRequest(httpMethod, url, body);
     else console.log(refreshResult);
   }
-
-  console.log(response);
 
   return response;
 };
@@ -140,6 +162,7 @@ export default function App() {
     }
     const { token, signupType, isLoggedIn } = cookieParser();
 
+    // 탭 닫은 경우 쿠키 삭제
     if (token !== "temp" && sessionStorage.getItem("id") === null ) {
       document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
       document.cookie = `refresh=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
@@ -147,6 +170,7 @@ export default function App() {
       document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     }
 
+    // 로그인 유지
     else if (token !== "temp" && signupType !== "temp" && isLoggedIn !== "0") {
       // requestKeepLoggedIn(token, signupType).then((res) => {
       dispatch({

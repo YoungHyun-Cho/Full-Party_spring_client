@@ -2,7 +2,7 @@ import axios from "axios";
 import { Dispatch } from 'redux'
 import { CLOSE_MODAL } from "./modalType";
 import { UserInfoDispatchType, SIGNIN_SUCCESS, SIGNIN_FAIL } from "./signinType";
-import { Headers } from "../App";
+import { Headers, setEachCookie, setSessionStorage } from "../App";
 
 type UserInfo = {
   email: string,
@@ -11,8 +11,8 @@ type UserInfo = {
 
 export const fetchUserdata = (userInfo: UserInfo) => async (dispatch: Dispatch<UserInfoDispatchType>) => {
   
-  document.cookie = "signupType=general";
-  document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+  setEachCookie("signupType", "general");
+  setEachCookie("isLoggedIn", "1");
 
   const headers: Headers = {};
 
@@ -28,11 +28,13 @@ export const fetchUserdata = (userInfo: UserInfo) => async (dispatch: Dispatch<U
       // document.cookie = `token=${res.headers['authorization']}`; // -> 쿠키에 토큰 저장 완료..
       // document.cookie = `refresh=${res.headers['refresh']}`; // 서버에서 setCookie 해줌 -> 여기서 할 필요 없음. 
 
-      sessionStorage.setItem("id", res.data.id);
-      sessionStorage.setItem("email", userInfo.email);
-      sessionStorage.setItem("userName", res.data.userName);
-      sessionStorage.setItem("profileImage", res.data.profileImage);
-      sessionStorage.setItem("address", res.data.address);
+      // sessionStorage.setItem("id", res.data.id);
+      // sessionStorage.setItem("email", userInfo.email);
+      // sessionStorage.setItem("userName", res.data.userName);
+      // sessionStorage.setItem("profileImage", res.data.profileImage);
+      // sessionStorage.setItem("address", res.data.address);
+
+      setSessionStorage({ ...res.data });
 
       dispatch({
         type: SIGNIN_SUCCESS,

@@ -717,7 +717,8 @@ export default function Mypage() {
         const userInfo = res.data;
         setBasicInfo({
           userName: userInfo.userName,
-          profileImage: IMAGE_SERVER_URL + `/${userInfo.profileImage}`, 
+          // profileImage: IMAGE_SERVER_URL + `/${userInfo.profileImage}`, 
+          profileImage: userInfo.profileImage.startsWith("http") ? userInfo.profileImage : IMAGE_SERVER_URL + `/${userInfo.profileImage}`,
           address: userInfo.address,
           level: userInfo.level,
           exp: userInfo.exp
@@ -755,6 +756,7 @@ export default function Mypage() {
       <MypageHeader>
         <div className="leftWrapper">
           <div className='profileImageContainer'>
+            {console.log(basicInfo)}
             <img
               src={basicInfo.profileImage ? basicInfo.profileImage : 'https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com/defaultProfile.png'}
               alt='thumbnail'

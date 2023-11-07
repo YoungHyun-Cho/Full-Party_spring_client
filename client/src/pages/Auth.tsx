@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { useDispatch } from 'react-redux';
-import { HttpMethod, cookieParser, sendRequest } from '../App';
+import { HttpMethod, cookieParser, sendRequest, setAllCookie, setSessionStorage } from '../App';
 
 export const LoadingContainer = styled.div`
   width: 100vw;
@@ -55,6 +55,7 @@ export default function Auth() {
     const signUpType = new URL(window.location.href).searchParams.get("sign_up_by");
 
     if (signUpType === "google") handleGoogleLogin();
+    if (signUpType === "kakao") handleKakaoLogin();
   }, []);
 
   const handleGoogleLogin = async () => {
@@ -67,20 +68,27 @@ export default function Auth() {
     //   payload: response.data.userInfo
     // });
 
-    const accessToken = new URL(window.location.href).searchParams.get("access_token");
-    const refreshToken = new URL(window.location.href).searchParams.get("refresh_token");
-    const userId = new URL(window.location.href).searchParams.get("user_id");
+    const searchParams = (name: string) => {
+      return new URL(window.location.href).searchParams.get(name) + "";
+    };
 
-    document.cookie = `signupType=google; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `token=${accessToken}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `refresh=${refreshToken}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    const accessToken = searchParams("access_token");
+    const refreshToken = searchParams("refresh_token");
+    const userId = searchParams("user_id");
+
+    // document.cookie = `signupType=google; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    // document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    // document.cookie = `token=${accessToken}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    // document.cookie = `refresh=${refreshToken}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
 
     const response = await sendRequest(
       HttpMethod.GET,
       `${process.env.REACT_APP_API_URL}/users/${userId}`,
       null
     );
+
+    setSessionStorage({ ...response.data });
+    setAllCookie("google", "1", accessToken, refreshToken);
  
     dispatch({
       type: SIGNIN_SUCCESS,
