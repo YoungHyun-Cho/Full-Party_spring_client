@@ -211,7 +211,7 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
   };
 
   const refuseHandler = async () => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyId}/deny/${userInfo.id}`);
+    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyId}/application?action=deny`);
     navigate(`../party/${partyId}`);
   };
 

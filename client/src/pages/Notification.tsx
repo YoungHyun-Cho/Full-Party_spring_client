@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faBullhorn, faScroll, faTrophy, faStar, faBellSlash } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../reducers';
-import { cookieParser } from '../App';
+import { HttpMethod, cookieParser, sendRequest } from '../App';
 
 export const NotificationContainer = styled.div`
   margin: 60px 0;
@@ -140,7 +140,13 @@ export default function Notification() {
     if (userId !== 0.1) {
       setIsLoading(true);
       (async () => {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/notification/${userId}`);
+        // const response = await axios.get(`${process.env.REACT_APP_API_URL}/notifications`);
+        const response = await sendRequest(
+          HttpMethod.GET,
+          `${process.env.REACT_APP_API_URL}/notifications`,
+          null
+        );
+        console.log(response);
         dispatch({
           type: NOTIFY,
           payload: {
@@ -180,7 +186,7 @@ export default function Notification() {
   return (
     <NotificationContainer>
       {notification.map((noti: {[key: string]: any}, idx: number) => {
-        if (!noti.partyId) {
+        if (!noti.partyId) { // 레벨 관련
           return (
             <Link to="/mypage" style={{ textDecoration: 'none' }} key={idx}>
               <div key={idx} className="notificationList" style={{ background: noti.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
@@ -193,7 +199,7 @@ export default function Notification() {
             </Link>
           );
         }
-        else if(noti.content === "dismiss") {
+        else if(noti.content === "dismiss") { // 파티 해산
           return (
             <div key={idx} className="notificationList" style={{ background: noti.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
               <div className="contentWrapper">
@@ -211,7 +217,7 @@ export default function Notification() {
             </div>
           );
         }
-        else {
+        else { // 파티 관련
           return (
             <Link to={`/party/${noti.partyId}${noti.commentId ? `/${noti.commentId}` : ""}`} style={{ textDecoration: 'none' }} key={idx}>
               <div key={idx} className="notificationList" style={{ background: noti.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>

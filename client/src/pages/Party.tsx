@@ -480,7 +480,7 @@ export default function Party() {
   };
 
   const cancelHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/application`, {
+    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/application?action=cancel`, {
       headers, withCredentials: true
     });
     const waiterLeft = partyInfo.waiterList.filter((waiter) => waiter.id !== userId);

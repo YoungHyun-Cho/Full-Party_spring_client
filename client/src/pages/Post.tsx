@@ -954,6 +954,7 @@ export default function Post() {
     }, {
       headers, withCredentials: true
     });
+
     return res;
   }
 
@@ -967,7 +968,10 @@ export default function Post() {
       .then((res) => {
         setIsPosted(false);
         // navigate(`../party/${res.data.newParty.id}`); 
-        navigate(`../party/${res.headers.location}`);// 헤더에 설정된 Location값으로 리디렉션
+        console.log(res)
+        const matches = res.headers.location.match(/\d+$/);
+        const partyId = matches ? matches[0] : -1;
+        navigate(`../party/${partyId}`);// 헤더에 설정된 Location값으로 리디렉션
 
       })
       .catch((err) => {
