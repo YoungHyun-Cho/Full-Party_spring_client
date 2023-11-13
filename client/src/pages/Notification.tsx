@@ -95,7 +95,7 @@ export default function Notification() {
     (state: AppState) => state.notifyReducer.isBadgeOn
   );
 
-  const [ notification, setNotification ] = useState<{ [key: string]: any }>([]);
+  const [ notifications, setNotifications ] = useState<{ [key: string]: any }>([]);
   const [ isLoading, setIsLoading ] = useState(true);
 
   type messageType = {
@@ -119,6 +119,25 @@ export default function Notification() {
     "levelup": "로 레벨이 올랐습니다!",
     "leveldown": "로 레벨이 떨어졌습니다."
   };
+
+  enum NotificationType {
+    APPLY = "APPLY",
+    ACCEPT ="ACCEPT",
+    DENY ="DENY",
+    CANCEL ="CANCEL",
+    EXPEL ="EXPEL",
+    QUIT ="QUIT",
+    HEART ="HEART",
+    COMPLETE ="COMPLETE",
+    REVIEW ="REVIEW",
+    FULL_PARTY ="FULL_PARTY",
+    RE_PARTY ="RE_PARTY",
+    DISMISS ="DISMISS",
+    COMMENT ="COMMENT",
+    REPLY ="REPLY",
+    LEVEL_UP ="LEVEL_UP",
+    LEVEL_DOWN ="LEVEL_DOWN"
+  }
 
   const timeForToday = (value: Date) => {
     const today = new Date();
@@ -153,19 +172,19 @@ export default function Notification() {
             isBadgeOn: response.data.notification
           }
         });
-        setNotification(response.data.notifications);
+        setNotifications(response.data.notifications);
       })();
     }
   }, [ userId ]);
 
   useEffect(() => {
     setIsLoading(false);
-  }, [ notification ]);
+  }, [ notifications ]);
 
   if (cookieParser().isLoggedIn === "0") return <Navigate to="../" />
   else if (isLoading) return <Loading />
 
-  if (notification.length <= 0) {
+  if (notifications.length <= 0) {
     return (<NotificationContainer>
       <div className="notificationList">
         <div className="contentWrapper">
@@ -185,63 +204,109 @@ export default function Notification() {
 
   return (
     <NotificationContainer>
-      {notification.map((noti: {[key: string]: any}, idx: number) => {
-        if (!noti.partyId) { // 레벨 관련
+      {notifications.map((notification: {[key: string]: any}, idx: number) => {
+        if (notification.type === "user") {
           return (
             <Link to="/mypage" style={{ textDecoration: 'none' }} key={idx}>
-              <div key={idx} className="notificationList" style={{ background: noti.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
+              <div key={idx} className="notificationList" style={{ background: notification.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
                 <div>
                   <FontAwesomeIcon icon={ faTrophy } className="icon level" />
-                  <span><strong>Lv.{noti.level}</strong>{message[noti.content]}</span>
+                  {/* <span><strong>Lv.{notification.level}</strong>{message[notification.content]}</span> */}
+                  <div className="titleContainer">
+                    <div className="partyNameContainer">
+                      [<div className="partyName">{notification.subject}</div>] 
+                    </div>
+                    <div className="content">{notification.content}</div>
+                  </div>
                 </div>
-                <div className="time">{timeForToday(noti.createdAt)}</div>
+                <div className="time">{timeForToday(notification.createdAt)}</div>
               </div>
             </Link>
           );
         }
-        else if(noti.content === "dismiss") { // 파티 해산
+        else {
           return (
-            <div key={idx} className="notificationList" style={{ background: noti.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
-              <div className="contentWrapper">
-                <div className="iconContainer">
-                  <FontAwesomeIcon icon={ faBullhorn } className="icon horn" />
-                </div>
-                <div className="titleContainer">
-                  <div className="partyNameContainer">
-                    [<div className="partyName">{noti.partyName}</div>]
-                  </div>
-                  <div className="content">{message[noti.content]}</div>
-                </div>
-              </div>
-              <div className="time">{timeForToday(noti.createdAt)}</div>
-            </div>
-          );
-        }
-        else { // 파티 관련
-          return (
-            <Link to={`/party/${noti.partyId}${noti.commentId ? `/${noti.commentId}` : ""}`} style={{ textDecoration: 'none' }} key={idx}>
-              <div key={idx} className="notificationList" style={{ background: noti.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
+            // notification.type === "do not link" ? `/home` : `/party/${notification.partyId}`
+            // <Link to={`/party/${notification.partyId}${notification.commentId ? `/${notification.commentId}` : ""}`} style={{ textDecoration: 'none' }} key={idx}>
+            <Link to={notification.label === NotificationType.DISMISS ? `/home` : `/party/${notification.partyId}`} style={{ textDecoration: 'none' }} key={idx}>
+              <div key={idx} className="notificationList" style={{ background: notification.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
                 <div className="contentWrapper">
                   <div className="iconContainer">
-                    {noti.content === "favorite" ? <FontAwesomeIcon icon={ faHeart } className="icon heart" /> : null}
-                    {noti.content === "complete" ? <FontAwesomeIcon icon={ faStar } className="icon star" /> : null }
-                    {noti.content === "question" || noti.content === "answer"|| noti.content === "reply" ? <FontAwesomeIcon icon={ faScroll } className="icon scroll" /> : null }
-                    {noti.content !== "favorite" && noti.content !== "complete" && noti.content !== "question" && noti.content !== "answer" && noti.content !== "reply" ?  
+                    {notification.label === NotificationType.HEART ? <FontAwesomeIcon icon={ faHeart } className="icon heart" /> : null}
+                    {notification.label === NotificationType.COMPLETE ? <FontAwesomeIcon icon={ faStar } className="icon star" /> : null }
+                    {notification.label === NotificationType.COMMENT || notification.label === NotificationType.REPLY ? <FontAwesomeIcon icon={ faScroll } className="icon scroll" /> : null }
+                    {notification.label !== NotificationType.HEART && notification.label !== NotificationType.COMPLETE && notification.label !== NotificationType.COMMENT && notification.label !== NotificationType.REPLY ?  
                       <FontAwesomeIcon icon={ faBullhorn } className="icon horn" />
                     : null}
                   </div>
                   <div className="titleContainer">
                     <div className="partyNameContainer">
-                      [<div className="partyName">{noti.partyName}</div>]
+                      [<div className="partyName">{notification.subject}</div>]
                     </div>
-                    <div className="content">{noti.userName? noti.userName : null}{message[noti.content]}</div>
+                    <div className="content">{notification.content}</div>
                   </div>
                 </div>
-                <div className="time">{timeForToday(noti.createdAt)}</div>
+                <div className="time">{timeForToday(notification.createdAt)}</div>
               </div>
             </Link>
           );
         }
+        // if (!notification.partyId) { // 레벨 관련
+        //   return (
+        //     <Link to="/mypage" style={{ textDecoration: 'none' }} key={idx}>
+        //       <div key={idx} className="notificationList" style={{ background: notification.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
+        //         <div>
+        //           <FontAwesomeIcon icon={ faTrophy } className="icon level" />
+        //           <span><strong>Lv.{notification.level}</strong>{message[notification.content]}</span>
+        //         </div>
+        //         <div className="time">{timeForToday(notification.createdAt)}</div>
+        //       </div>
+        //     </Link>
+        //   );
+        // }
+        // else if(notification.content === "dismiss") { // 파티 해산
+        //   return (
+        //     <div key={idx} className="notificationList" style={{ background: notification.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
+        //       <div className="contentWrapper">
+        //         <div className="iconContainer">
+        //           <FontAwesomeIcon icon={ faBullhorn } className="icon horn" />
+        //         </div>
+        //         <div className="titleContainer">
+        //           <div className="partyNameContainer">
+                    // [<div className="partyName">{notification.partyName}</div>]
+        //           </div>
+        //           <div className="content">{message[notification.content]}</div>
+        //         </div>
+        //       </div>
+        //       <div className="time">{timeForToday(notification.createdAt)}</div>
+        //     </div>
+        //   );
+        // }
+        // else { // 파티 관련
+        //   return (
+        //     <Link to={`/party/${notification.partyId}${notification.commentId ? `/${notification.commentId}` : ""}`} style={{ textDecoration: 'none' }} key={idx}>
+        //       <div key={idx} className="notificationList" style={{ background: notification.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
+        //         <div className="contentWrapper">
+        //           <div className="iconContainer">
+        //             {notification.content === "favorite" ? <FontAwesomeIcon icon={ faHeart } className="icon heart" /> : null}
+        //             {notification.content === "complete" ? <FontAwesomeIcon icon={ faStar } className="icon star" /> : null }
+        //             {notification.content === "question" || notification.content === "answer"|| notification.content === "reply" ? <FontAwesomeIcon icon={ faScroll } className="icon scroll" /> : null }
+        //             {notification.content !== "favorite" && notification.content !== "complete" && notification.content !== "question" && notification.content !== "answer" && notification.content !== "reply" ?  
+        //               <FontAwesomeIcon icon={ faBullhorn } className="icon horn" />
+        //             : null}
+        //           </div>
+        //           <div className="titleContainer">
+        //             <div className="partyNameContainer">
+        //               [<div className="partyName">{notification.partyName}</div>]
+        //             </div>
+        //             <div className="content">{notification.userName? notification.userName : null}{message[notification.content]}</div>
+        //           </div>
+        //         </div>
+        //         <div className="time">{timeForToday(notification.createdAt)}</div>
+        //       </div>
+        //     </Link>
+        //   );
+        // }
       }).reverse()}
     </NotificationContainer>
   );

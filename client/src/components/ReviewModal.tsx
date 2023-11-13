@@ -9,7 +9,7 @@ import { faSadCry, faSadTear, faSmile, faGrinWink, faLaughBeam } from '@fortawes
 import { faSadCry as blankSadCry, faSadTear as blankSadTear, faSmile as blankSmile,
   faGrinWink as blankGrinWink, faLaughBeam as blankLaughBeam
 } from '@fortawesome/free-regular-svg-icons';
-import { Headers, cookieParser } from '../App';
+import { Headers, HttpMethod, cookieParser, sendRequest } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -226,9 +226,16 @@ export default function ReviewModal({ reviewModalHandler, members, leaderId, isL
     const reviewedMembers = reviewMembers.map(member => ({ userId: member.id, exp: member.exp}));
 
     if (isLeader) {
-      await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyId}/states`, {
-        partyState: "퀘스트 완료"
-      }, { withCredentials: true });
+      // await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyId}/state?party_state=퀘스트 완료`, {
+      //   partyState: "퀘스트 완료"
+      // }, { withCredentials: true });
+
+      await sendRequest(
+        HttpMethod.PATCH,
+        `${process.env.REACT_APP_API_URL}/parties/${partyId}/state?party_state=퀘스트 완료`,
+        null
+      );
+
       handlePartyInfoChange("partyState", 2);
     }
     

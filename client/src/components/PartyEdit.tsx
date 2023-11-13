@@ -13,6 +13,7 @@ import { AppState } from '../reducers';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
 import { RootReducerType } from '../store/store';
+import { HttpMethod, sendRequest } from '../App';
 
 export const PostContainer = styled.div`
   width: 100%;
@@ -784,27 +785,30 @@ export default function PartyEdit({ party, editHandler, handleOnOff }: Props) {
   }
 
   const patchParty = async () => {
-    console.log(signinReducer.userInfo.id);
-    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}`, {
-      userId: signinReducer.userInfo.id,
-      id: partyInfo.id,
-      name: partyInfo.name,
-      image: partyInfo.image,
-      memberLimit: partyInfo.memberLimit,
-      content: partyInfo.content,
-      region:
-        party.isOnline ?
-        signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
-        : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
-      location: partyInfo.location,
-      coordinates: party.isOnline ? { lat: 0, lng: 0 } : partyInfo.coordinates,
-      startDate: partyInfo.startDate,
-      endDate: partyInfo.endDate,
-      isOnline: party.isOnline,
-      privateLink: partyInfo.privateLink,
-      partyState: partyInfo.partyState,
-      tags: tags
-    }, { withCredentials: true });
+    
+    const res = await sendRequest(
+      HttpMethod.PATCH,
+      `${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}`, 
+      {
+        userId: signinReducer.userInfo.id,
+        id: partyInfo.id,
+        name: partyInfo.name,
+        image: partyInfo.image,
+        memberLimit: partyInfo.memberLimit,
+        content: partyInfo.content,
+        region:
+          party.isOnline ?
+          signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
+          : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
+        location: partyInfo.location,
+        coordinates: party.isOnline ? { lat: 0, lng: 0 } : partyInfo.coordinates,
+        startDate: partyInfo.startDate,
+        endDate: partyInfo.endDate,
+        isOnline: party.isOnline,
+        privateLink: partyInfo.privateLink,
+        partyState: partyInfo.partyState,
+        tags: tags
+    });
     console.log(res);
     return res;
   }

@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
+import { HttpMethod, sendRequest } from '../App';
 
 export const QnAContainer = styled.section`
   header {
@@ -206,11 +207,18 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
   };
 
   const postHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    await axios.post(`${process.env.REACT_APP_API_URL}/party/${partyId}/comment`, {
-      userId,
-      partyId,
-      content: newComment.comment
-    }, { withCredentials: true });
+    // await axios.post(`${process.env.REACT_APP_API_URL}/comments`, {
+    //   userId,
+    //   partyId,
+    //   content: newComment.comment
+    // }, { withCredentials: true });
+
+    await sendRequest(
+      HttpMethod.POST,
+      `${process.env.REACT_APP_API_URL}/comments`,
+      { partyId, content: newComment.comment }
+    );
+
     setIsEditMode(false);
     setCommentIdx(0);
     setIsCommentOpen(true);
@@ -219,9 +227,16 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
   };
 
   const replyHandler = async (event: React.MouseEvent<HTMLButtonElement>, commentId:number) => {
-    await axios.post(`${process.env.REACT_APP_API_URL}/party/${commentId}/subComment`, {
-      userId, commentId, content: newComment.subcomment
-    }, { withCredentials: true });
+    // await axios.post(`${process.env.REACT_APP_API_URL}/comments/${commentId}/reply`, {
+    //   userId, commentId, content: newComment.subcomment
+    // }, { withCredentials: true });
+
+    await sendRequest(
+      HttpMethod.POST,
+      `${process.env.REACT_APP_API_URL}/comments/${commentId}/reply`,
+      { commentId, content: newComment.subcomment }
+    );
+
     setNewComment({ ...newComment, subcomment: "" });
     navigate(`../party/${partyId}`);
   };

@@ -1,6 +1,6 @@
 import './App.css';
 import React, { useEffect, Fragment } from 'react';
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import Home from './pages/Home';
 import List from './pages/List';
 import Party from './pages/Party';
@@ -20,7 +20,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from './reducers';
 import { RootReducerType } from './store/store';
-import { SIGNIN_SUCCESS } from './actions/signinType';
+import { SIGNIN_FAIL, SIGNIN_SUCCESS } from './actions/signinType';
 import dotenv from "dotenv";
 import { fetchUserdata } from './actions/signin';
 import { bool } from 'aws-sdk/clients/signer';
@@ -120,7 +120,7 @@ export const setAllCookie = (signUpType: string, isLoggedIn: string, accessToken
 export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any): Promise<any> => {
 
   let response;
-  const headers = getHeaders();
+  let headers = getHeaders();
 
   try {
     switch (httpMethod) {
@@ -130,12 +130,30 @@ export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any
       case HttpMethod.DELETE: response = await axios.delete(url, headers); break;
     }
 
-    if (response.status === 401) throw new Error();
+    // if (response.status === 401) throw new Error();
   }
-  catch(error) {
-    const refreshResult = await axios.get(`${process.env.REACT_APP_API_URL}/auth/refresh`, headers);
-    if (refreshResult.status === 200) return await sendRequest(httpMethod, url, body);
-    else console.log(refreshResult);
+  catch(error : any) {
+    if (error.response.status === 401) {
+
+      headers.headers.Authorization = "temp";
+
+      try {
+        const refreshResult = await axios.get(`${process.env.REACT_APP_API_URL}/auth/refresh`, headers);
+        if (refreshResult.status === 200) return await sendRequest(httpMethod, url, body);
+        else console.log(refreshResult);
+      }
+      catch(e: any) {
+        console.log(e.response);
+        if (e.response.status === 401) {
+          // 리프레시 토큰 만료 -> 로그아웃 처리
+
+          await axios.post(`${process.env.REACT_APP_API_URL}/auth/signout`, {});
+
+          setEachCookie("isLoggedIn", "2");
+          window.location.href = `${process.env.REACT_APP_CLIENT_URL}/`;
+        }
+      }
+    }
   }
 
   return response;
@@ -144,6 +162,7 @@ export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any
 export const IMAGE_SERVER_URL="https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com";
 
 export default function App() {
+
   const dispatch = useDispatch();
 
   const isLoggedIn = useSelector(
@@ -164,10 +183,12 @@ export default function App() {
 
     // 탭 닫은 경우 쿠키 삭제
     if (token !== "temp" && sessionStorage.getItem("id") === null ) {
-      document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-      document.cookie = `refresh=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-      document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-      document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      // document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      // document.cookie = `refresh=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      // document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      // document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+
+      setAllCookie("temp", "0", "temp", "temp");
     }
 
     // 로그인 유지
@@ -181,6 +202,15 @@ export default function App() {
 
       // headers.Authorization = "Bearer " + cookieParser()["token"];
       // headers.Refresh = cookieParser()["refresh"];
+    }
+
+    if (isLoggedIn === "2") {
+      setAllCookie("temp", "0", "temp", "temp");
+      dispatch({
+        type: SIGNIN_FAIL
+      });
+      window.location.reload();
+      sessionStorage.clear();
     }
   }, []);
 

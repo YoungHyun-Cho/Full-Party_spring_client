@@ -196,8 +196,8 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
   };
 
   const editConfirmHandler = async () => {
-    await axios.patch(`${process.env.REACT_APP_API_URL}/party/message`, {
-      userId: userInfo.id, partyId, message: newMsg,
+    await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyId}/users/${userInfo.id}/message`, {
+      message: newMsg,
     });
     handleMemberInfoChange(userInfo.id, "message", newMsg);
     setIsEditMode(!isEditMode);
@@ -211,14 +211,14 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
   };
 
   const refuseHandler = async () => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyId}/application?action=deny`);
+    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyId}/application/${userId}`);
     navigate(`../party/${partyId}`);
   };
 
   const acceptHandler = async () => {
     console.log(userId)
-    await axios.post(`${process.env.REACT_APP_API_URL}/parties/${partyId}/participation`, 
-      { userId: userInfo.id }, 
+    await axios.post(`${process.env.REACT_APP_API_URL}/parties/${partyId}/participation/${userInfo.id}`, 
+      {},
       { headers, withCredentials: true }
     );
     navigate(`../party/${partyId}`);

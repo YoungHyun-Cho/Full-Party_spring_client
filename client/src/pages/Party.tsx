@@ -16,7 +16,7 @@ import { AppState } from '../reducers';
 import { NOTIFY } from '../actions/notify';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { cookieParser, Headers } from "../App";
+import { cookieParser, Headers, HttpMethod, sendRequest } from "../App";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
 import { faArrowLeft, faShareAlt, faComments, faMapMarkerAlt, faCalendarAlt, faHeart,
@@ -522,11 +522,18 @@ export default function Party() {
   // };
 
   const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/states`, 
-    { partyState: "모집 완료" }, 
-    { headers, withCredentials: true });
-    console.log(res);
-    if (res.status === 200) {
+    // const res = await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/state?party_state=fullparty`, 
+    // { partyState: "모집 완료" }, 
+    // { headers, withCredentials: true });
+
+    const response = await sendRequest(
+      HttpMethod.PATCH,
+      `${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/state?party_state=모집 완료`,
+      null
+    );
+
+    console.log(response);
+    if (response.status === 200) {
       setPartyInfo({
         ...partyInfo,
         partyState: "모집 완료"
@@ -535,9 +542,15 @@ export default function Party() {
   };
 
   const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/states`, 
-    { partyState: "모집 중" });
-    if (res.status === 200) {
+    // const res = await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/state?party_state=모집 중`, 
+    // {});
+    const response = await sendRequest(
+      HttpMethod.PATCH,
+      `${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/state?party_state=모집 중`,
+      null
+    );
+
+    if (response.status === 200) {
       setPartyInfo({
         ...partyInfo,
         partyState: "모집 중"
@@ -554,26 +567,58 @@ export default function Party() {
     setIsUserInfoModalOpen(false);
     setIsLoading(true);
     if (params.commentId) setFindComment(Number(params.commentId));
-    axios.get(`${process.env.REACT_APP_API_URL}/parties/${params.partyId}`, 
-    { headers, withCredentials: true })
-    .then(res => {
-      console.log(res);
-      setPartyInfo({ ...res.data });
-      setComments(res.data.comments);
-      dispatch({
-        type: NOTIFY,
-        payload: {
-          isBadgeOn: res.data.notification
-        }
-      });
-    })
-    .catch(err => {
-      console.log(err);
-      if (err.response.status === 404) {
+    
+    (async () => {
+      
+      const response = await sendRequest(
+        HttpMethod.GET,
+        `${process.env.REACT_APP_API_URL}/parties/${params.partyId}`,
+        null
+      );
+
+      if (response.status === 200) {
+        console.log(response);
+        setPartyInfo({ ...response.data });
+        setComments(response.data.comments);
+        dispatch({
+          type: NOTIFY,
+          payload: {
+            isBadgeOn: response.data.notification
+          }
+        });
+      }
+      else if (response.status === 404) {
+        console.log(response);
         setNotFound(true);
         setIsLoading(false);
       }
-    });
+
+    })();
+    // sendRequest(
+    //   HttpMethod.GET,
+    //   `${process.env.REACT_APP_API_URL}/parties/${params.partyId}`,
+    //   null
+    // );
+    // .then(res => {
+    //   console.log(res);
+    //   setPartyInfo({ ...res.data });
+    //   setComments(res.data.comments);
+    //   dispatch({
+    //     type: NOTIFY,
+    //     payload: {
+    //       isBadgeOn: res.data.notification
+    //     }
+    //   });
+    // })
+    // .catch(err => {
+    //   console.log(err);
+    //   if (err.response.status === 404) {
+    //     setNotFound(true);
+    //     setIsLoading(false);
+    //   }
+    // });
+
+
     setIsLoading(false);
   }, [ params ]);
 

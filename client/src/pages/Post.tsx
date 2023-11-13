@@ -8,7 +8,7 @@ import ErrorModal from '../components/ErrorModal';
 import Loading from '../components/Loading';
 import AddressInput from '../components/AddressInput';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { cookieParser, Headers } from "../App";
+import { cookieParser, Headers, HttpMethod, sendRequest } from "../App";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
 import { useSelector } from 'react-redux';
@@ -933,30 +933,50 @@ export default function Post() {
     }
   };
 
-  const postParty = async () => {
+  // const postParty = async () => {
 
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/parties`, {
-      name: partyInfo.name,
-      image: partyInfo.image,
-      memberLimit: partyInfo.memberLimit,
-      content: partyInfo.content,
-      region:
-        isOnline?
-        signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
-        : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
-      location: partyInfo.location,
-      coordinates: isOnline? {lat: 0, lng: 0} : partyInfo.coordinates,
-      startDate: partyInfo.startDate,
-      endDate: partyInfo.endDate,
-      isOnline: isOnline,
-      privateLink: partyInfo.privateLink,
-      tags
-    }, {
-      headers, withCredentials: true
-    });
+    // return await axios.post(`${process.env.REACT_APP_API_URL}/parties`, {
+    //   name: partyInfo.name,
+    //   image: partyInfo.image,
+    //   memberLimit: partyInfo.memberLimit,
+    //   content: partyInfo.content,
+    //   region:
+    //     isOnline?
+    //     signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
+    //     : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
+    //   location: partyInfo.location,
+    //   coordinates: isOnline? {lat: 0, lng: 0} : partyInfo.coordinates,
+    //   startDate: partyInfo.startDate,
+    //   endDate: partyInfo.endDate,
+    //   isOnline: isOnline,
+    //   privateLink: partyInfo.privateLink,
+    //   tags
+    // }, {
+    //   headers, withCredentials: true
+    // });
 
-    return res;
-  }
+  //   return await sendRequest(
+  //     HttpMethod.POST,
+  //     `${process.env.REACT_APP_API_URL}/parties`,
+  //     {
+  //       name: partyInfo.name,
+  //       image: partyInfo.image,
+  //       memberLimit: partyInfo.memberLimit,
+  //       content: partyInfo.content,
+  //       region:
+  //         isOnline?
+  //         signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
+  //         : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
+  //       location: partyInfo.location,
+  //       coordinates: isOnline? {lat: 0, lng: 0} : partyInfo.coordinates,
+  //       startDate: partyInfo.startDate,
+  //       endDate: partyInfo.endDate,
+  //       isOnline: isOnline,
+  //       privateLink: partyInfo.privateLink,
+  //       tags
+  //     }
+  //   );
+  // }
 
   useEffect(() => {
     validationCheck();
@@ -964,21 +984,63 @@ export default function Post() {
 
   useEffect(() => {
     if (isPosted){
-      postParty()
-      .then((res) => {
-        setIsPosted(false);
-        // navigate(`../party/${res.data.newParty.id}`); 
-        console.log(res)
-        const matches = res.headers.location.match(/\d+$/);
-        const partyId = matches ? matches[0] : -1;
-        navigate(`../party/${partyId}`);// 헤더에 설정된 Location값으로 리디렉션
 
-      })
-      .catch((err) => {
-        console.log(err);
-        setIsErrorModalOpen(true);
-        setIsPosted(false);
-      });
+      (async () => {
+        const response = await sendRequest(
+          HttpMethod.POST,
+          `${process.env.REACT_APP_API_URL}/parties`,
+          {
+            name: partyInfo.name,
+            image: partyInfo.image,
+            memberLimit: partyInfo.memberLimit,
+            content: partyInfo.content,
+            region:
+              isOnline?
+              signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
+              : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
+            location: partyInfo.location,
+            coordinates: isOnline? {lat: 0, lng: 0} : partyInfo.coordinates,
+            startDate: partyInfo.startDate,
+            endDate: partyInfo.endDate,
+            isOnline: isOnline,
+            privateLink: partyInfo.privateLink,
+            tags
+          }
+        );
+
+        if (response.status === 201) {
+          setIsPosted(false);
+          console.log(response.headers.location);
+          const matches = response.headers.location.match(/\d+$/);
+          const partyId = matches ? matches[0] : -1;
+          navigate(`../party/${partyId}`);// 헤더에 설정된 Location값으로 리디렉션  
+        }
+
+        else {
+          console.log(response);
+          setIsErrorModalOpen(true);
+          setIsPosted(false);
+        }
+
+
+      })();
+
+
+      // postParty()
+      // .then((res) => {
+      //   setIsPosted(false);
+      //   // navigate(`../party/${res.data.newParty.id}`); 
+      //   console.log(res.headers.location);
+      //   const matches = res.headers.location.match(/\d+$/);
+      //   const partyId = matches ? matches[0] : -1;
+      //   navigate(`../party/${partyId}`);// 헤더에 설정된 Location값으로 리디렉션
+
+      // })
+      // .catch((err) => {
+      //   console.log(err);
+      //   setIsErrorModalOpen(true);
+      //   setIsPosted(false);
+      // });
     }
   }, [ isPosted ]);
 

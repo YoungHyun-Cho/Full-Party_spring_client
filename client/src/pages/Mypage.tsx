@@ -10,7 +10,7 @@ import PostCodeModal from '../components/PostCodeModal';
 import EmptyParty from '../components/EmptyParty';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { cookieParser, Headers, IMAGE_SERVER_URL } from "../App";
+import { cookieParser, Headers, HttpMethod, IMAGE_SERVER_URL, sendRequest, setEachCookie } from "../App";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { NOTIFY } from "../actions/notify";
@@ -656,17 +656,31 @@ export default function Mypage() {
   };
 
   const handleSignOut = async () => {
-    const { token, signupType } = cookieParser();
-    await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {}, {
-      headers: {
-        access_token: token,
-        signup_type: signupType
-      }
-    });
+    // const { token, signupType } = cookieParser();
+    // await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {}, {
+    //   headers: {
+    //     access_token: token,
+    //     signup_type: signupType
+    //   }
+    // });
+
+    await sendRequest(
+      HttpMethod.POST,
+      `${process.env.REACT_APP_API_URL}/auth/signout?signup-type=${cookieParser()["signupType"]}`,
+      {}
+    );
+
+    // 서버측에서 토큰 관련 쿠키는 삭제해줌. 프론트에서는 기타 쿠키만 삭제하고, 세션 스토리지만 삭제하면 됨. 
+
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    // document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    setEachCookie("signupType", "temp");
+    setEachCookie("isLoggedIn", "0");
+    sessionStorage.clear();
+
+    // document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    // document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    window.location.reload();
     navigate("/");
   };
 
@@ -756,7 +770,7 @@ export default function Mypage() {
       <MypageHeader>
         <div className="leftWrapper">
           <div className='profileImageContainer'>
-            {console.log(basicInfo)}
+            {/* {console.log(basicInfo)} */}
             <img
               src={basicInfo.profileImage ? basicInfo.profileImage : 'https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com/defaultProfile.png'}
               alt='thumbnail'
