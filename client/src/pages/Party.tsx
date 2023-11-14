@@ -480,9 +480,15 @@ export default function Party() {
   };
 
   const cancelHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/application?action=cancel`, {
-      headers, withCredentials: true
-    });
+    // await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/application`, {
+    //   headers, withCredentials: true
+    // });
+
+    await sendRequest(
+      HttpMethod.DELETE,
+      `${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/application/${userId}`,
+      null
+    );
     const waiterLeft = partyInfo.waiterList.filter((waiter) => waiter.id !== userId);
     setPartyInfo({
       ...partyInfo,
@@ -495,7 +501,13 @@ export default function Party() {
   };
 
   const quitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/participation/${userId}`);
+    // await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/participation/${userId}`);
+
+    await sendRequest(
+      HttpMethod.DELETE,
+      `${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/participation/${userId}`,
+      null
+    );
     const memberLeft = partyInfo.memberList.filter((member) => member.id !== userId);
     setPartyInfo({
       ...partyInfo,
@@ -860,7 +872,7 @@ export default function Party() {
             <button id="completeBtn" onClick={reviewModalHandler}>퀘스트 완료</button>
           : null}
           {isMember && partyInfo.partyState === "퀘스트 완료" && !partyInfo.isReviewed ? 
-            <button id="completeBtn" onClick={reviewModalHandler}>퀘스트 완료</button>
+            <button id="completeBtn" onClick={reviewModalHandler}>파티원 리뷰</button>
           : null}
         </PartyStateBtns>
       </Main>

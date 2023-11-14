@@ -226,7 +226,7 @@ export default function ReviewModal({ reviewModalHandler, members, leaderId, isL
     const reviewedMembers = reviewMembers.map(member => ({ userId: member.id, exp: member.exp}));
 
     if (isLeader) {
-      // await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyId}/state?party_state=퀘스트 완료`, {
+      // await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyId}/state?party_state=`, {
       //   partyState: "퀘스트 완료"
       // }, { withCredentials: true });
 

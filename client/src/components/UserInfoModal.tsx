@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faFlag, faAward, faCalendarCheck } from '@fortawesome/free-solid-svg-icons';
-import { Headers, cookieParser } from '../App';
+import { Headers, HttpMethod, cookieParser, sendRequest } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -199,29 +199,57 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
     await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyId}/users/${userInfo.id}/message`, {
       message: newMsg,
     });
+
+    await sendRequest(
+      HttpMethod.PATCH,
+      `${process.env.REACT_APP_API_URL}/parties/${partyId}/users/${userInfo.id}/message`,
+      { message: newMsg }
+    );
+
     handleMemberInfoChange(userInfo.id, "message", newMsg);
     setIsEditMode(!isEditMode);
     navigate(`../party/${partyId}`);
   };
 
   const expelHandler = async () => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyId}/participation/${userInfo.id}`, 
-    { headers, withCredentials: true });
+    // await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyId}/participation/${userInfo.id}`, 
+    // { headers, withCredentials: true });
+
+    await sendRequest(
+      HttpMethod.DELETE,
+      `${process.env.REACT_APP_API_URL}/parties/${partyId}/participation/${userInfo.id}`,
+      null
+    )
     navigate(`../party/${partyId}`);
+    window.location.reload();
   };
 
   const refuseHandler = async () => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyId}/application/${userId}`);
+    // await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyId}/application/${userId}`);
+    
+    await sendRequest(
+      HttpMethod.DELETE,
+      `${process.env.REACT_APP_API_URL}/parties/${partyId}/application/${userInfo.id}`,
+      null
+    );
     navigate(`../party/${partyId}`);
+    window.location.reload();
   };
 
   const acceptHandler = async () => {
-    console.log(userId)
-    await axios.post(`${process.env.REACT_APP_API_URL}/parties/${partyId}/participation/${userInfo.id}`, 
-      {},
-      { headers, withCredentials: true }
+    // console.log(userId)
+    // await axios.post(`${process.env.REACT_APP_API_URL}/parties/${partyId}/participation/${userInfo.id}`, 
+    //   {},
+    //   { headers, withCredentials: true }
+    // );
+
+    await sendRequest(
+      HttpMethod.POST,
+      `${process.env.REACT_APP_API_URL}/parties/${partyId}/participation/${userInfo.id}`,
+      {}
     );
     navigate(`../party/${partyId}`);
+    window.location.reload();
   }
 
   return (

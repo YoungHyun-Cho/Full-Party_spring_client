@@ -131,7 +131,11 @@ export default function Search() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setWord(e.target.value);
 
-  const searchQuest = () => navigate(`../search/keyword/${word}`);
+  const searchQuest = () => {
+    
+    navigate(`../search/keyword/${word}`)
+    window.location.reload();
+  };
 
   const hashtagHandler = (tag: string) => navigate(`/search/tag/${tag}`);
 
@@ -162,6 +166,7 @@ export default function Search() {
         }
       }
       searchData();
+      // setResponse(searchData());
     }
     else if (params.keyword) {
       const keyword = params.keyword;
@@ -183,12 +188,18 @@ export default function Search() {
         }
       }
       searchData();
+      // setResponse(searchData());
     }
-    setIsLoading(false)
+    setIsLoading(false);
+    
     return () => {
       isComponentMounted = false
     }
   }, [ params ]);
+  // }, [ response ]);
+
+  // useEffect(() => {
+  // }, [ parties ]);
 
   if (cookieParser().isLoggedIn === "0") return <Navigate to="../" />
   else if (isLoading) return <Loading />
