@@ -132,12 +132,16 @@ export default function LocalMap({ location, localParty }: Props) {
 
   useEffect(() => {
     geocoder.addressSearch(location, (result: any, status: any) => {
+      location = "경기도 수원시 장안구 대평로 27";
+      console.log(location)
+      console.log(status)
       if (status === kakao.maps.services.Status.OK) {
         const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
         const { La, Ma } = coordinates;
         setCoords({ lat: Ma, lng: La });
       }
     });
+
   }, [ localParty ]);
 
   return (

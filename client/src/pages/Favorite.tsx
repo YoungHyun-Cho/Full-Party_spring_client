@@ -54,7 +54,7 @@ export default function Favorite() {
       dispatch({
         type: NOTIFY,
         payload: {
-          isBadgeOn: response.data.notification
+          isBadgeOn: response.data.notificationBadge
         }
       });
       setFavoriteList(response.data.parties);

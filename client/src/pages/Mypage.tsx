@@ -338,7 +338,8 @@ export default function Mypage() {
     profileImage: "",
     address: "",
     level: 0,
-    exp: 0
+    exp: 0,
+    levelUpExp: 0
   });
   const [ changeInfo, setChangeInfo ] = useState({
     userName: '',
@@ -439,7 +440,12 @@ export default function Mypage() {
     if (isChange) setIsChange(false);
     else {
       setIsInfoLoading(true);
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}/details`);
+      // const res = await axios.get(`${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}/details`);
+      const res = await sendRequest(
+        HttpMethod.GET,
+        `${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}/details`,
+        null
+      );
       const userInfo = res.data;
       setChangeInfo({
         ...changeInfo,
@@ -718,14 +724,20 @@ export default function Mypage() {
   useEffect(() => {
     (async () => {
       if (userInfoFromStore.id >= 1) {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/users/${userInfoFromStore.id}`, {
-          withCredentials: true,
-        });
+        // const res = await axios.get(`${process.env.REACT_APP_API_URL}/users/${userInfoFromStore.id}`, {
+        //   withCredentials: true,
+        // });
+
+        const res = await sendRequest(
+          HttpMethod.GET,
+          `${process.env.REACT_APP_API_URL}/users/${userInfoFromStore.id}`,
+          null
+        );
 
         dispatch({
           type: NOTIFY,
           payload: {
-            isBadgeOn: res.data.notification
+            isBadgeOn: res.data.notificationBadge
           }
         });
         const userInfo = res.data;
@@ -735,7 +747,8 @@ export default function Mypage() {
           profileImage: userInfo.profileImage.startsWith("http") ? userInfo.profileImage : IMAGE_SERVER_URL + `/${userInfo.profileImage}`,
           address: userInfo.address,
           level: userInfo.level,
-          exp: userInfo.exp
+          exp: userInfo.exp,
+          levelUpExp: userInfo.levelUpExp
         });
         setChangeInfo({
           ...changeInfo,
@@ -787,7 +800,8 @@ export default function Mypage() {
           </div>
           <ProgressBar>
             <div className="barContainer">
-              <div className="barFiller" style={{ width: `${Math.floor(basicInfo.exp % 20) * 5}%` }} />
+              {/* <div className="barFiller" style={{ width: `${Math.floor(basicInfo.exp % 20) * 5}%` }} /> */}
+              <div className="barFiller" style={{ width: `${(basicInfo.exp / basicInfo.levelUpExp) * 100}%` }} />
             </div>
           </ProgressBar>
         </p>

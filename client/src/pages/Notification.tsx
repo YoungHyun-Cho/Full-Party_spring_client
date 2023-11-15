@@ -169,7 +169,7 @@ export default function Notification() {
         dispatch({
           type: NOTIFY,
           payload: {
-            isBadgeOn: response.data.notification
+            isBadgeOn: response.data.notificationBadge
           }
         });
         setNotifications(response.data.notifications);
@@ -209,8 +209,10 @@ export default function Notification() {
           return (
             <Link to="/mypage" style={{ textDecoration: 'none' }} key={idx}>
               <div key={idx} className="notificationList" style={{ background: notification.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
-                <div>
-                  <FontAwesomeIcon icon={ faTrophy } className="icon level" />
+                <div className="contentWrapper">
+                  <div className="iconContainer">
+                    <FontAwesomeIcon icon={ faTrophy } className="icon level" />
+                  </div>
                   {/* <span><strong>Lv.{notification.level}</strong>{message[notification.content]}</span> */}
                   <div className="titleContainer">
                     <div className="partyNameContainer">

@@ -595,7 +595,7 @@ export default function Party() {
         dispatch({
           type: NOTIFY,
           payload: {
-            isBadgeOn: response.data.notification
+            isBadgeOn: response.data.notificationBadge
           }
         });
       }

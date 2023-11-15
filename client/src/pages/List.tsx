@@ -79,7 +79,7 @@ export default function List() {
         dispatch({
           type: NOTIFY,
           payload: {
-            isBadgeOn: response.data.notification
+            isBadgeOn: response.data.notificationBadge
           }
         });
         // const parsedLocalParty = response.data.localQuests.map((item: any) => ({ ...item, latlng: JSON.parse(item.latlng) }));
@@ -121,6 +121,7 @@ export default function List() {
       {/* {console.log("localparties : " + localParties)} */}
       {localParties.length > 0 ?
         <LocalQuest location={userInfo.address} localParty={localParties} />
+        // <LocalQuest location={searchRegion} localParty={localParties} />
         : <EmptyCard from="list" />}
     </ListContainer>
   );

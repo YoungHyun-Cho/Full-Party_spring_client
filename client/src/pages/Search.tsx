@@ -157,7 +157,7 @@ export default function Search() {
         dispatch({
           type: NOTIFY,
           payload: {
-            isBadgeOn: res.data.notification
+            isBadgeOn: res.data.notificationBadge
           }
         });
         if (isComponentMounted) {
@@ -179,7 +179,7 @@ export default function Search() {
         dispatch({
           type: NOTIFY,
           payload: {
-            isBadgeOn: res.data.notification
+            isBadgeOn: res.data.notificationBadge
           }
         });
         if (isComponentMounted) {
