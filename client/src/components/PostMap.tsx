@@ -120,7 +120,7 @@ export default function PostMap({ coordinates, location, name, image, handleCoor
         <MapMarker
           position={coords}
           image={{
-            src: "../img/mapMarker.png",
+            src: "img/mapMarker.png",
             size: { width: 50, height: 50 },
             options: { offset: { x: 24.15, y: 69 } },
           }}

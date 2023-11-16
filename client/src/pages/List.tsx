@@ -51,6 +51,7 @@ export default function List() {
   const [ isLoading, setIsLoading ] = useState(true);
   const [ myParties, setMyParties ] = useState([]);
   const [ localParties, setLocalParties ] = useState([]);
+  const [ coordinates, setCoordinates ] = useState({ lat: 37.496562, lng: 127.024761 });
 
   useEffect(() => {
 
@@ -65,17 +66,13 @@ export default function List() {
       const searchRegion = userInfo.address.split(" ")[0] + " " + userInfo.address.split(" ")[1];
 
       (async () => {
-        // const response = await axios.get(`${process.env.REACT_APP_API_URL}/parties?region=${searchRegion}`, {
-        //   withCredentials: true, 
-        //   headers
-        // });
-
+        
         const response = await sendRequest(
           HttpMethod.GET, 
           `${process.env.REACT_APP_API_URL}/parties?region=${searchRegion}`,
           null
         );
-        
+      
         dispatch({
           type: NOTIFY,
           payload: {
@@ -88,6 +85,7 @@ export default function List() {
           return party.memberLimit !== party.memberList.length;
         }));
         setMyParties(response.data.myParties);
+        setCoordinates(response.data.coordinates);
         setIsLoading(false); // 중복 렌더링 발생하여 일시적으로 변경함. 추후 영구 반영 결정 필요
       })();
     }
@@ -120,7 +118,7 @@ export default function List() {
       : null}
       {/* {console.log("localparties : " + localParties)} */}
       {localParties.length > 0 ?
-        <LocalQuest location={userInfo.address} localParty={localParties} />
+        <LocalQuest location={userInfo.address} coordinates={coordinates} localParty={localParties} />
         // <LocalQuest location={searchRegion} localParty={localParties} />
         : <EmptyCard from="list" />}
     </ListContainer>

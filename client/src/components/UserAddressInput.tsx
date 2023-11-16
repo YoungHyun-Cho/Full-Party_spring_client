@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import UserMap from '../components/UserMap';
 import PostCodeModal from '../components/PostCodeModal';
+import { Map } from 'react-kakao-maps-sdk';
 
 export const AddressInputContainer = styled.div`
   input:disabled {
@@ -19,11 +20,15 @@ type Props = {
   profileImage: string,
   address: string,
   handleAddressChange: Function,
+  handleCoordsChange: Function,
   isSearch: boolean,
   searchHandler: Function
 };
 
-export default function UserAddressInput({ profileImage, address, handleAddressChange, isSearch, searchHandler }: Props) {
+export default function UserAddressInput({ profileImage, address, handleAddressChange, handleCoordsChange, isSearch, searchHandler }: Props) {
+
+  const geocoder = new kakao.maps.services.Geocoder();
+
   const [ fullAddress, setFullAddress ] = useState({
     address: "",
     detailedAddress: "",
@@ -32,11 +37,22 @@ export default function UserAddressInput({ profileImage, address, handleAddressC
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { address, extraAddress } = fullAddress;
+
+    console.log(address)
+
     setFullAddress({
       ...fullAddress,
       detailedAddress: event.target.value,
     });
     handleAddressChange(`${address} ${event.target.value} ${extraAddress ? `(${extraAddress})` : ''}`);
+
+    geocoder.addressSearch(address, (result: any, status: any) => {
+      if (status === kakao.maps.services.Status.OK) {
+        const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
+        const { La, Ma }: any = coordinates;
+        handleCoordsChange({ lat: Ma, lng: La });
+      }
+    });
   };
 
   const autoCompleteHandler = (address: string, extraAddress: string) => {
@@ -77,6 +93,7 @@ export default function UserAddressInput({ profileImage, address, handleAddressC
       {isSearch ?
         <PostCodeModal
           searchHandler={searchHandler}
+          handleCoordsChange={handleCoordsChange}
           autoCompleteHandler={autoCompleteHandler}
         />
       : null}

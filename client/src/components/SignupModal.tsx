@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDispatch } from 'react-redux';
 import { modalChanger } from '../actions/modal';
 import { faTimes, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import { Coordinates, HttpMethod, sendRequest } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -244,7 +245,7 @@ export default function SignupModal() {
   const [ pageIdx, setPageIdx ] = useState(0);
 
   const [ userInfo, setUserInfo ] = useState<Info>({
-    profileImage: 'img/defaultProfile.png',
+    profileImage: 'defaultProfile.png',
     email: '',
     password: '',
     confirmPassword: '',
@@ -291,6 +292,8 @@ export default function SignupModal() {
   const [ fixedLocation, setFixedLocation ] = useState('');
   const [ formatAddress, setFormatAddress ] = useState('');
   const [ inputCode, setInputCode ] = useState('');
+
+  const [ coordinates, setCoordinates ] = useState({ lat: 37.496562, lng: 127.024761 });
 
   const [ verificationData, setVerificationData ] = useState({
     email: userInfo.email,
@@ -409,6 +412,8 @@ export default function SignupModal() {
     });
   };
 
+  const handleCoordsChange = (changedCoords: Coordinates) => setCoordinates(changedCoords);
+
   const searchHandler = (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => setIsSearch(!isSearch);
 
   const mailVerification = async () => {
@@ -461,7 +466,7 @@ export default function SignupModal() {
     });
   };
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
 
     console.log(userInfo);
     const { profileImage, email, password, name, gender, birth, mobile, address } = userInfo;
@@ -482,17 +487,27 @@ export default function SignupModal() {
       });
     }
     else {
+
+      const geocoder = new kakao.maps.services.Geocoder();
+
+      geocoder.addressSearch(address, (result: any, status: any) => {
+        if (status === kakao.maps.services.Status.OK) {
+          const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
+          const { La, Ma }: any = coordinates;
+          handleCoordsChange({ lat: Ma, lng: La });
+        }
+      });
+
       setIsRequested(true);
-      axios.post(`${process.env.REACT_APP_API_URL}/users`,{
-        userName: name,
-        profileImage,
-        email,
-        password,
-        birth,
-        gender,
-        mobile,
-        address
-      }, { withCredentials: true })
+
+      await sendRequest(
+        HttpMethod.POST,
+        `${process.env.REACT_APP_API_URL}/users`,
+        {
+          userName: name, profileImage, email, password, 
+          birth, gender, mobile, address, coordinates
+        }
+      )
       .then((res) => {
         if (res.data.message === 'Already Signed Up') {
           setIsError({
@@ -692,6 +707,7 @@ export default function SignupModal() {
                       profileImage={userInfo.profileImage}
                       address={userInfo.address}
                       handleAddressChange={handleAddressChange}
+                      handleCoordsChange={handleCoordsChange}
                       isSearch={isSearch}
                       searchHandler={searchHandler}
                     />

@@ -5,7 +5,7 @@ import LocalQuest from '../components/LocalQuest';
 import EmptyCard from '../components/EmptyCard';
 import Loading from '../components/Loading';
 import { useDispatch } from 'react-redux';
-import { Headers, cookieParser } from "../App";
+import { Headers, HttpMethod, cookieParser, sendRequest } from "../App";
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -128,6 +128,7 @@ export default function Search() {
   const [ word, setWord ] = useState<string | undefined>('');
   const [ parties, setParties ] = useState<any>([]);
   const [ isLoading, setIsLoading ] = useState(false);
+  const [ coordinates, setCoordinates ] = useState({ lat: 37.496562, lng: 127.024761 });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setWord(e.target.value);
 
@@ -149,8 +150,18 @@ export default function Search() {
     if (params.tag) {
       const tag = params.tag;
       const searchData = async () => {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search/tag?value=${tag}&region=${searchRegion}`,
-        { headers, withCredentials: true } );
+
+        // const res = await axios.get(`${process.env.REACT_APP_API_URL}/search/tag?value=${tag}&region=${searchRegion}`,
+        // { headers, withCredentials: true } );
+
+        const res = await sendRequest(
+          HttpMethod.GET,
+          `${process.env.REACT_APP_API_URL}/search/tag?value=${tag}&region=${searchRegion}`,
+          null
+        );
+
+        setCoordinates(res.data.coordinates);
+
         const partyData = res.data.result;
         console.log(res);
         // const parsedData = partyData.map((party: any) => ({ ...party, "latlng": JSON.parse(party.latlng) }));
@@ -171,9 +182,18 @@ export default function Search() {
     else if (params.keyword) {
       const keyword = params.keyword;
       const searchData = async () => {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search/keyword?value=${keyword}&region=${searchRegion}`,
-        { headers, withCredentials: true });
-        console.log(res);
+
+        // const res = await axios.get(`${process.env.REACT_APP_API_URL}/search/keyword?value=${keyword}&region=${searchRegion}`,
+        // { headers, withCredentials: true });
+
+        const res = await sendRequest(
+          HttpMethod.GET,
+          `${process.env.REACT_APP_API_URL}/search/keyword?value=${keyword}&region=${searchRegion}`,
+          null
+        );
+
+        setCoordinates(res.data.coordinates);
+
         const partyData = res.data.result;
         // const parsedData = partyData.map((party: any) => ({ ...party, latlng: JSON.parse(party.latlng) }));
         dispatch({
@@ -230,7 +250,7 @@ export default function Search() {
           else if (parties.length !== 0) {
             return(
               <div className='result'>
-                <LocalQuest location={userAddress} localParty={parties} /> 
+                <LocalQuest location={userAddress} coordinates={coordinates} localParty={parties} /> 
               </div>
             )
           }

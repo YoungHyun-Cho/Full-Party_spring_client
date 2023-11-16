@@ -152,6 +152,7 @@ const AddressInput = ({ partyInfo, handleCoordsChange, handleLocationChange, han
       {isSearch ?
         <PostCodeModal
           searchHandler={searchHandler}
+          handleCoordsChange={handleCoordsChange}
           autoCompleteHandler={autoCompleteHandler}
         />
       : null}

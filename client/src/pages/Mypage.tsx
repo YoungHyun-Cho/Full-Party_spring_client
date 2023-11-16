@@ -10,7 +10,7 @@ import PostCodeModal from '../components/PostCodeModal';
 import EmptyParty from '../components/EmptyParty';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { cookieParser, Headers, HttpMethod, IMAGE_SERVER_URL, sendRequest, setEachCookie } from "../App";
+import { cookieParser, Coordinates, Headers, HttpMethod, IMAGE_SERVER_URL, sendRequest, setEachCookie } from "../App";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { NOTIFY } from "../actions/notify";
@@ -328,6 +328,7 @@ export default function Mypage() {
   const [ from, setFrom ] = useState('');
   const [ fixedLocation, setFixedLocation ] = useState('');
   const [ formatAddress, setFormatAddress ] = useState('');
+  const [ coordinates, setCoordinates ] = useState({ lat: 37.496562, lng: 127.024761 });
   const [ relatedParties, setRelatedParties ] = useState({
     leadingParties: [],
     participatingParties: [],
@@ -374,6 +375,8 @@ export default function Mypage() {
     detailedAddress: "",
     extraAddress: "",
   });
+
+  const handleCoordsChange = (changedCoords: Coordinates) => setCoordinates(changedCoords);
 
   const userRegion = basicInfo.address.split(" ").length < 2 ?
     "지역 미설정" :
@@ -446,7 +449,9 @@ export default function Mypage() {
         `${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}/details`,
         null
       );
+
       const userInfo = res.data;
+
       setChangeInfo({
         ...changeInfo,
         userName: userInfo.userName,
@@ -455,6 +460,7 @@ export default function Mypage() {
         gender: userInfo.gender,
         mobile: userInfo.mobile
       });
+
       setIsInfoLoading(false);
       setIsChange(true);
     }
@@ -568,6 +574,7 @@ export default function Mypage() {
   const submitInfo = async () => {
     const { userName, profileImage, password, confirm, birth, gender, address, mobile, nowPwd } = changeInfo;
     const { isName, isMobile } = isError;
+
     if (password !== confirm || !isName || !isMobile) {
       setIsError({
         ...isError,
@@ -590,6 +597,7 @@ export default function Mypage() {
         birth,
         gender,
         address,
+        coordinates,
         mobile
       });
       if (res.status === 200) {
@@ -606,6 +614,7 @@ export default function Mypage() {
       }
     }
     else if (password !== '') {
+
       const res = await axios.patch(`${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}`, {
         profileImage,
         userName,
@@ -613,6 +622,7 @@ export default function Mypage() {
         birth,
         gender,
         address,
+        coordinates,
         mobile
       });
       if (res.status === 200) {
@@ -628,6 +638,9 @@ export default function Mypage() {
         navigate('/mypage');
       }
     }
+
+    sessionStorage.setItem("profileImage", profileImage);
+    sessionStorage.setItem("address", address);
   }
 
   const filterParticipatingParties = () => {
@@ -776,6 +789,7 @@ export default function Mypage() {
       {isVerificationModalOpen? <VerificationModal userId={userInfoFromStore?.id} email={userInfoFromStore?.email} handleIsChange={handleIsChange} verficationModalHandler={verficationModalHandler} /> : null}
       {isSearch ?
         <PostCodeModal
+          handleCoordsChange={handleCoordsChange}
           searchHandler={searchHandler}
           autoCompleteHandler={autoCompleteHandler}
         />

@@ -93,12 +93,12 @@ export default function PartyMap({ isMember, latlng, image }: Props) {
         zoomable={zoomable}
         onZoomChanged={(map) => map.setLevel(map.getLevel() > 7 ? 7 : map.getLevel())}
       >
-        {isMember ?
+        {/* {isMember ? */}
           <>
             <MapMarker
               position={coords}
               image={{
-                src: "../img/mapMarker.png",
+                src: "img/mapMarker.png",
                 size: { width: 50, height: 50 },
                 options: { offset: { x: 24.15, y: 69 } },
               }}
@@ -110,23 +110,24 @@ export default function PartyMap({ isMember, latlng, image }: Props) {
               <div className="partyImg" style={{background: `url(${image})`, backgroundSize: "cover", backgroundPosition: "center"}} />
             </CustomOverlayMap>
           </>
-        :
+        {/* :
           <Circle
             center={coords}
-            radius={800}
+            radius={500}
             strokeWeight={1}
             strokeColor={"#50C9C3"}
             strokeOpacity={0.5}
             fillColor={"#50C9C3"}
             fillOpacity={0.4}
-          />
-        }
+          /> */}
+        {/* } */}
         <CustomOverlayMap
-          position={isMember ? coords : { lat: lat - 0.002, lng: lng - 0.0001}}
+          // position={isMember ? coords : { lat: lat - 0.0035, lng: lng + 0.0005}}
+          position={coords}
           yAnchor={1}
         >
           <div className="infoWindow">
-            {isMember ? 
+            {/* {isMember ?  */}
               <a
                 href={`https://map.kakao.com/link/map/퀘스트장소,${lat},${lng}`}
                 target="_blank"
@@ -134,11 +135,11 @@ export default function PartyMap({ isMember, latlng, image }: Props) {
               >
                 <span className="title">퀘스트 장소</span>
               </a>
-            :
-              <a href="#" onClick={e => e.preventDefault()}>
+            {/* : */}
+              {/* <a href="#" onClick={e => e.preventDefault()}>
                 <span className="title">퀘스트 장소</span>
-              </a>
-            }
+              </a> */}
+            {/* } */}
           </div>
         </CustomOverlayMap>
       </Map>

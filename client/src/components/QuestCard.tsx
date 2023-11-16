@@ -224,7 +224,8 @@ export default function QuestCard ({ party }: Props) {
           <div className="infoHeader">
             <div
               className="leaderProfile"
-              style={{ backgroundImage: `url(${memberList[0].profileImage})`, backgroundSize: "cover" }}
+              // style={{ backgroundImage: `url(${memberList[0].profileImage})`, backgroundSize: "cover" }}
+              style={{ backgroundImage: `url(${party.image})`, backgroundSize: "cover" }}
             />
             <div className="infoContainer">
               <div className="title">

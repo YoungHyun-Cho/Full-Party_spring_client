@@ -790,7 +790,7 @@ export default function Party() {
               latlng={partyInfo.coordinates}
               image={partyInfo.image}
             />  
-            {!isMember? "파티원에게는 더 정확한 장소가 표시됩니다." : null}
+            {/* {!isMember? "파티원에게는 더 정확한 장소가 표시됩니다." : null} */}
           </div> 
         : null}
 

@@ -32,6 +32,10 @@ declare global {
   }
 };
 
+export type Coordinates = {
+  lat: number, lng: number 
+};
+
 export const cookieParser = () => {
   const cookieString = document.cookie.split("; ");
   const keyAndValue = cookieString.map(item => item.split("="));

@@ -4,6 +4,7 @@ import QuestCard from '../components/QuestCard';
 import LocalMap from '../components/LocalMap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare, faCheckSquare } from '@fortawesome/free-solid-svg-icons';
+import { Coordinates } from '../App';
 
 export const LocalQuestContainer = styled.section`
   margin-bottom: 20px;
@@ -58,10 +59,11 @@ export const LocalQuestContainer = styled.section`
 
 type Props = {
   location: string,
+  coordinates: Coordinates,
   localParty: Array<{ [key: string]: any }>
 };
 
-export default function LocalQuest({ location, localParty }: Props) {
+export default function LocalQuest({ location, coordinates, localParty }: Props) {
   const [ partyList, setPartyList ] = useState(localParty.map(local => local).reverse());
   const [ checked, setChecked ] = useState({ online: true, offline: true });
 
@@ -120,7 +122,7 @@ export default function LocalQuest({ location, localParty }: Props) {
             : null}
           </div>
         </header>
-        {checked.offline ? <LocalMap location={location} localParty={localParty.filter(local => !local.isOnline)} /> : null}
+        {checked.offline ? <LocalMap coordinates={coordinates} localParty={localParty.filter(local => !local.isOnline)} /> : null}
         {partyList.map((party, idx) => <QuestCard key={idx} party={party} />)}
     </LocalQuestContainer>
   );

@@ -4,6 +4,7 @@ import axios, { AxiosError } from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { error } from 'console';
+import { HttpMethod, sendRequest } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -106,10 +107,11 @@ export default function  VerificationModal({ userId, email, handleIsChange, verf
   const handleVerification = async (e: React.MouseEvent<HTMLButtonElement>) => {
 
     try {
-      const response = await axios.post(
+
+      const response = await sendRequest(
+        HttpMethod.POST,
         `${process.env.REACT_APP_API_URL}/auth/verification`, 
         { userId, email, password },
-        { withCredentials: true }
       );
 
       if (response.status === 200) {

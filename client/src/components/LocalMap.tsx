@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
+import { Coordinates } from '../App';
 
 export const MapContainer = styled.section`
   width: 100%;
@@ -70,11 +71,11 @@ export const MapContainer = styled.section`
 `;
 
 type Props = {
-  location: string,
+  coordinates: Coordinates
   localParty: Array<{ [key: string]: any }>
 };
 
-export default function LocalMap({ location, localParty }: Props) {
+export default function LocalMap({ coordinates, localParty }: Props) {
   const navigate = useNavigate();
   const { kakao } = window;
   const geocoder = new kakao.maps.services.Geocoder();
@@ -131,16 +132,19 @@ export default function LocalMap({ location, localParty }: Props) {
   }
 
   useEffect(() => {
-    geocoder.addressSearch(location, (result: any, status: any) => {
-      location = "경기도 수원시 장안구 대평로 27";
-      console.log(location)
-      console.log(status)
-      if (status === kakao.maps.services.Status.OK) {
-        const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
-        const { La, Ma } = coordinates;
-        setCoords({ lat: Ma, lng: La });
-      }
-    });
+    
+    // geocoder.addressSearch(location, (result: any, status: any) => {
+    //   console.log(location)
+    //   console.log(status)
+    //   if (status === kakao.maps.services.Status.OK) {
+    //     const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
+    //     const { La, Ma } = coordinates;
+    //     setCoords({ lat: Ma, lng: La });
+    //     console.log(La, Ma)
+    //   }
+    // });
+
+    setCoords(coordinates);
 
   }, [ localParty ]);
 

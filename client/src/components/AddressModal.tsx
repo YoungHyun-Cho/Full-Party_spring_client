@@ -9,7 +9,7 @@ import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
 import { useDispatch, useSelector } from 'react-redux';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
-import { HttpMethod, getHeaders, sendRequest, setSessionStorage } from '../App';
+import { Coordinates, HttpMethod, getHeaders, sendRequest, setSessionStorage } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -148,6 +148,7 @@ export default function  AddressModal() {
 
   const [ pageIdx, setPageIdx ] = useState(0);
   const [ address, setAddress ] = useState('');
+  const [ coordinates, setCoordinates ] = useState({ lat: 37.496562, lng: 127.024761 });
   const [ errorMsg, setErrorMsg ] = useState('');
   const [ isSearch, setIsSearch ] = useState(false);
 
@@ -161,6 +162,8 @@ export default function  AddressModal() {
 
   const handleAddressChange = (address: string) => setAddress(address);
 
+  const handleCoordsChange = (changedCoords: Coordinates) => setCoordinates(changedCoords);
+
   const searchHandler = (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => setIsSearch(!isSearch);
 
   const handlePageChange = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -172,16 +175,11 @@ export default function  AddressModal() {
   const handleAddressRegister = async () => {
     if (address) {
       setErrorMsg('');
-      
-      // const res = await axios.patch(`${process.env.REACT_APP_API_URL}/users/${userInfo.id}`, 
-      //   { address },
-      //   getHeaders()
-      // );
 
       const res = await sendRequest(
         HttpMethod.PATCH, 
         `${process.env.REACT_APP_API_URL}/users/${userInfo.id}`,
-        { address }
+        { address, coordinates }
       );
 
       console.log(res);
@@ -216,9 +214,10 @@ export default function  AddressModal() {
                 </div>
                 <div className='mapInput'>
                   <UserAddressInput 
-                    profileImage={userInfo.profileImage ? userInfo.profileImage : "https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultProfile.png"}
+                    profileImage={userInfo.profileImage ? userInfo.profileImage : "https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com/defaultProfile.png"}
                     address={userInfo.address}
                     handleAddressChange={handleAddressChange}
+                    handleCoordsChange={handleCoordsChange}
                     isSearch={isSearch}
                     searchHandler={searchHandler}
                   />

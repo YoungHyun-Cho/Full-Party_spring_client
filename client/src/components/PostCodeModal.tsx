@@ -122,14 +122,29 @@ export const BtnContainer = styled.section`
 
 type Props = {
   searchHandler: Function,
-  autoCompleteHandler: Function
+  autoCompleteHandler: Function,
+  handleCoordsChange: Function
 };
 
-export default function PostCodeModal({ searchHandler, autoCompleteHandler }: Props) {
+export default function PostCodeModal({ searchHandler, autoCompleteHandler, handleCoordsChange }: Props) {
   const closeModal = () => searchHandler();
 
   const handleComplete = (data: any) => {
     let fullAddress = data.address;
+
+    const geocoder = new kakao.maps.services.Geocoder();
+
+    // const coordinates = { lat: 37.496562,lng: 127.024761};
+    geocoder.addressSearch(fullAddress, (result: any, status: any) => {
+      if (status === kakao.maps.services.Status.OK) {
+        const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
+        const { La, Ma }: any = coordinates;
+        handleCoordsChange({ lat: Ma, lng: La });
+      }
+    });
+
+    // handleCoordsChange(coordinates);
+
     let extraAddress = '';
     if (data.addressType === 'R') {
       if (data.bname !== '') extraAddress += data.bname;
