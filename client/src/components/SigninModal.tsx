@@ -220,7 +220,8 @@ export default function SigninModal() {
     //   "https://localhost:8080/oauth2/authorization/google"
     // );
 
-    window.location.href = "https://localhost:8080/oauth2/authorization/google";
+    // window.location.href = "https://localhost:8080/oauth2/authorization/google";
+    window.location.href = `${process.env.REACT_APP_API_URL}/oauth2/authorization/google`;
 
     // console.log(response);
   };
@@ -229,7 +230,8 @@ export default function SigninModal() {
     // const url = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`;
     // window.location.assign(url);
 
-    window.location.href = "https://localhost:8080/oauth2/authorization/kakao";
+    // window.location.href = "https://localhost:8080/oauth2/authorization/kakao";
+    window.location.href = `${process.env.REACT_APP_API_URL}/oauth2/authorization/kakao`;
   };
 
   const guestLoginHandler = async () => {
