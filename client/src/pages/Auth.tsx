@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { useDispatch } from 'react-redux';
-import { HttpMethod, cookieParser, sendRequest, setAllCookie, setSessionStorage } from '../App';
+import { HttpMethod, cookieParser, sendRequest, setAllCookie, setCookie, setSessionStorage } from '../App';
 
 export const LoadingContainer = styled.div`
   width: 100vw;
@@ -64,9 +64,9 @@ export default function Auth() {
 
   const handleSocialLogin = async (provider: string) => {
 
+    const userId = searchParams("user_id");
     const accessToken = searchParams("access_token");
     const refreshToken = searchParams("refresh_token");
-    const userId = searchParams("user_id");
 
     const response = await sendRequest(
       HttpMethod.GET,
@@ -75,6 +75,7 @@ export default function Auth() {
     );
 
     setSessionStorage({ ...response.data });
+
     setAllCookie(provider, "1", accessToken, refreshToken);
  
     dispatch({
@@ -84,81 +85,6 @@ export default function Auth() {
 
     navigate("../home");
   };
-
-  // const handleGoogleLogin = async () => {
-  //   // const authorizationCode = new URL(window.location.href).searchParams.get("code");
-  //   // const response = await axios.post(`${process.env.REACT_APP_API_URL}/google`, {
-  //   //   authorizationCode
-  //   // }, { withCredentials: true });
-  //   // dispatch({
-  //   //   type: SIGNIN_SUCCESS,
-  //   //   payload: response.data.userInfo
-  //   // });
-
-  //   const accessToken = searchParams("access_token");
-  //   const refreshToken = searchParams("refresh_token");
-  //   const userId = searchParams("user_id");
-
-  //   // document.cookie = `signupType=google; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-  //   // document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-  //   // document.cookie = `token=${accessToken}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-  //   // document.cookie = `refresh=${refreshToken}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-
-  //   const response = await sendRequest(
-  //     HttpMethod.GET,
-  //     `${process.env.REACT_APP_API_URL}/users/${userId}`,
-  //     null
-  //   );
-
-  //   setSessionStorage({ ...response.data });
-  //   setAllCookie("google", "1", accessToken, refreshToken);
- 
-  //   dispatch({
-  //     type: SIGNIN_SUCCESS,
-  //     payload: response.data
-  //   });
-
-  //   navigate("../home");
-  // };
-
-  // const handleKakaoLogin = async () => {
-  //   // try {
-  //   //   const authorizationCode = new URL(window.location.href).searchParams.get("code");
-  //   //   const response = await axios.post(`${process.env.REACT_APP_API_URL}/kakao`, {
-  //   //     authorizationCode
-  //   //   }, { withCredentials: true });
-  //   //   dispatch({
-  //   //     type: SIGNIN_SUCCESS,
-  //   //     payload: response.data.userInfo
-  //   //   });
-  //   //   document.cookie = `signupType=kakao; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-  //   //   document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-  //   //   navigate("../home");
-  //   // }
-  //   // catch (error) {
-  //   //   console.log(error);
-  //   // }
-
-  //   const accessToken = searchParams("access_token");
-  //   const refreshToken = searchParams("refresh_token");
-  //   const userId = searchParams("user_id");
-
-  //   const response = await sendRequest(
-  //     HttpMethod.GET,
-  //     `${process.env.REACT_APP_API_URL}/users/${userId}`,
-  //     null
-  //   );
-
-  //   setSessionStorage({ ...response.data });
-  //   setAllCookie("kakao", "1", accessToken, refreshToken);
- 
-  //   dispatch({
-  //     type: SIGNIN_SUCCESS,
-  //     payload: response.data
-  //   });
-
-  //   navigate("../home");
-  // };
 
   if (cookieParser().isLoggedIn === "1") navigate('../home');
 

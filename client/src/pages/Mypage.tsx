@@ -10,7 +10,7 @@ import PostCodeModal from '../components/PostCodeModal';
 import EmptyParty from '../components/EmptyParty';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { cookieParser, Coordinates, Headers, HttpMethod, IMAGE_SERVER_URL, sendRequest, setEachCookie } from "../App";
+import { cookieParser, Coordinates, Headers, HttpMethod, IMAGE_SERVER_URL, sendRequest, setCookie } from "../App";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { NOTIFY } from "../actions/notify";
@@ -693,8 +693,8 @@ export default function Mypage() {
 
     dispatch({ type: SIGNIN_FAIL });
     // document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    setEachCookie("signupType", "temp");
-    setEachCookie("isLoggedIn", "0");
+    setCookie("signupType", "temp");
+    setCookie("isLoggedIn", "0");
     sessionStorage.clear();
 
     // document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;

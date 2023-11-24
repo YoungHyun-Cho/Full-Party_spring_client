@@ -79,7 +79,7 @@ export default function List() {
             isBadgeOn: response.data.notificationBadge
           }
         });
-        // const parsedLocalParty = response.data.localQuests.map((item: any) => ({ ...item, latlng: JSON.parse(item.latlng) }));
+        
         const parsedLocalParties = response.data.localParties;
         setLocalParties(parsedLocalParties.filter((party: any) => {
           return party.memberLimit !== party.memberList.length;

@@ -77,7 +77,7 @@ export default function UserAddressInput({ profileImage, address, handleAddressC
         <div id='map' className='mapDesc'>
           <UserMap
             address={address}
-            image={profileImage} 
+            profileImage={profileImage} 
           />
         </div>
       </div>

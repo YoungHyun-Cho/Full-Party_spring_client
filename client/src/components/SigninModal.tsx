@@ -10,7 +10,7 @@ import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
 import { CLOSE_MODAL } from '../actions/modalType';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
-import { HttpMethod, sendRequest } from '../App';
+import { HttpMethod, sendRequest, setSessionStorage } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -235,10 +235,16 @@ export default function SigninModal() {
   };
 
   const guestLoginHandler = async () => {
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/guest`, {}, {
-      withCredentials: true
-    });
-    const payload = response.data.userInfo;
+  
+    const response = await sendRequest(
+      HttpMethod.POST,
+      `${process.env.REACT_APP_API_URL}/auth/guest`,
+      {}
+    );
+
+    setSessionStorage({ ...response.data });
+
+    const payload = response.data;
     dispatch({
       type: SIGNIN_SUCCESS,
       payload
@@ -248,6 +254,7 @@ export default function SigninModal() {
     });
     document.cookie = `signupType=guest; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+
     navigate('/home');
   };
 

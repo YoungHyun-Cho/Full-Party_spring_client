@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
+import { IMAGE_SERVER_URL } from "../App";
 
 export const MapContainer = styled.div`
   width: 100%;
@@ -66,11 +67,11 @@ export const MapContainer = styled.div`
 `;
 
 type Props = {
-  image: string,
+  profileImage: string,
   address: string
 };
 
-export default function UserMap({ image, address }: Props) {
+export default function UserMap({ profileImage, address }: Props) {
   const { kakao } = window;
   const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
   const { lat, lng } = coords;
@@ -121,7 +122,7 @@ export default function UserMap({ image, address }: Props) {
           position={coords}
           yAnchor={2.4}
         >
-          <div className="partyImg" style={{background: `url(${image})`, backgroundPosition: "center", backgroundSize: "cover"}} />
+          <div className="partyImg" style={{background: `url(${IMAGE_SERVER_URL}/${profileImage})`, backgroundPosition: "center", backgroundSize: "cover"}} />
         </CustomOverlayMap>
         <CustomOverlayMap
           position={coords}

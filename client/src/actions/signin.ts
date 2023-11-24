@@ -2,7 +2,7 @@ import axios from "axios";
 import { Dispatch } from 'redux'
 import { CLOSE_MODAL } from "./modalType";
 import { UserInfoDispatchType, SIGNIN_SUCCESS, SIGNIN_FAIL } from "./signinType";
-import { Headers, setEachCookie, setSessionStorage } from "../App";
+import { Headers, HttpMethod, sendRequest, setCookie, setSessionStorage } from "../App";
 
 type UserInfo = {
   email: string,
@@ -11,19 +11,21 @@ type UserInfo = {
 
 export const fetchUserdata = (userInfo: UserInfo) => async (dispatch: Dispatch<UserInfoDispatchType>) => {
   
-  setEachCookie("signupType", "general");
-  setEachCookie("isLoggedIn", "1");
+  setCookie("signupType", "general");
+  setCookie("isLoggedIn", "1");
 
   const headers: Headers = {};
 
-  await axios.post(`${process.env.REACT_APP_API_URL}/auth/signin`, userInfo, {
-    withCredentials: true
-  })
+  await sendRequest(
+    HttpMethod.POST,
+    `${process.env.REACT_APP_API_URL}/auth/signin`, 
+    userInfo
+  )
   .then((res) => {
     if (res.status === 200) {
 
-      headers.Authorization = res.headers['authorization'];
-      headers.Refresh = res.headers['refresh'];
+      // headers.Authorization = res.headers['authorization'];
+      // headers.Refresh = res.headers['refresh'];
 
       // document.cookie = `token=${res.headers['authorization']}`; // -> 쿠키에 토큰 저장 완료..
       // document.cookie = `refresh=${res.headers['refresh']}`; // 서버에서 setCookie 해줌 -> 여기서 할 필요 없음. 

@@ -810,8 +810,11 @@ export default function Post() {
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code === 'Enter' || e.code === 'Space') {
-      if (!tags.includes(inputTxt) && inputTxt && tags.length < 3) {
-        setTags([...tags, inputTxt]);
+
+      setInputTxt(inputTxt.slice(0, -3));
+
+      if (!tags.includes(inputTxt.toLowerCase()) && inputTxt && tags.length < 3) {
+        setTags([...tags, inputTxt.toLowerCase()]);
         setInputTxt('');
       }
     }
@@ -985,6 +988,8 @@ export default function Post() {
   useEffect(() => {
     if (isPosted){
 
+      console.log(tags);
+
       (async () => {
         const response = await sendRequest(
           HttpMethod.POST,
@@ -1076,7 +1081,6 @@ export default function Post() {
             <>
               <img className="preview" src={partyInfo.image} alt="thumbnail"
                 onError={() => {
-                  // return (imgRef.current.src = 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png')
                   return (imgRef.current.src = 'https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png')
                 }}
               />
@@ -1206,9 +1210,9 @@ export default function Post() {
                 type='text'
                 maxLength={10}
                 value={inputTxt}
-                placeholder={tags.length === 3 ? '' : '최대 3개까지 추가할 수 있습니다.'}
+                placeholder={tags.length === 3 ? '더 이상 추가할 수 없습니다.' : '최대 3개까지 추가할 수 있습니다.'}
                 autoComplete='off'
-                onChange={(e) => setInputTxt(e.target.value)}
+                onChange={(e) => setInputTxt(e.target.value.replace(/\s/g, ""))}
                 onKeyUp={(e) => addTag(e)}
               />
             </TagInput>

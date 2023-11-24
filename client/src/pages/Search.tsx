@@ -148,11 +148,9 @@ export default function Search() {
     let isComponentMounted = true;
     setIsLoading(true);
     if (params.tag) {
+      
       const tag = params.tag;
       const searchData = async () => {
-
-        // const res = await axios.get(`${process.env.REACT_APP_API_URL}/search/tag?value=${tag}&region=${searchRegion}`,
-        // { headers, withCredentials: true } );
 
         const res = await sendRequest(
           HttpMethod.GET,
@@ -182,9 +180,6 @@ export default function Search() {
     else if (params.keyword) {
       const keyword = params.keyword;
       const searchData = async () => {
-
-        // const res = await axios.get(`${process.env.REACT_APP_API_URL}/search/keyword?value=${keyword}&region=${searchRegion}`,
-        // { headers, withCredentials: true });
 
         const res = await sendRequest(
           HttpMethod.GET,
@@ -235,7 +230,7 @@ export default function Search() {
           onKeyUp={(e) => enterKey(e)}
           placeholder='검색어를 입력해주세요'
         />
-        <div className='faSearch' onClick={searchQuest}>
+        <div className='faSearch' onClick={() => searchQuest()}>
           <FontAwesomeIcon icon={faSearch} />
         </div>
       </SearchBar>

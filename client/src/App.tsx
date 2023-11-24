@@ -110,15 +110,15 @@ export const setSessionStorage = ({ id, email, userName, profileImage, address }
   sessionStorage.setItem("address", checkValue("address", address));
 };
 
-export const setEachCookie = (name: string, value: any) => {
-    document.cookie = `${name}=${value}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+export const setCookie = (name: string, value: any) => {
+  document.cookie = `${name}=${value}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
 };
 
 export const setAllCookie = (signUpType: string, isLoggedIn: string, accessToken: string, refreshToken: string) => {
-  setEachCookie("token", accessToken);
-  setEachCookie("refresh", refreshToken);
-  setEachCookie("signupType", signUpType);
-  setEachCookie("isLoggedIn", isLoggedIn);
+  setCookie("token", accessToken);
+  setCookie("refresh", refreshToken);
+  setCookie("signupType", signUpType);
+  setCookie("isLoggedIn", isLoggedIn);
 };
 
 export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any): Promise<any> => {
@@ -153,7 +153,7 @@ export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any
 
           await axios.post(`${process.env.REACT_APP_API_URL}/auth/signout`, {});
 
-          setEachCookie("isLoggedIn", "2");
+          setCookie("isLoggedIn", "2");
           window.location.href = `${process.env.REACT_APP_CLIENT_URL}/`;
         }
       }
@@ -178,6 +178,7 @@ export default function App() {
 
   useEffect(() => {
     if (!Kakao.isInitialized()) initialize();
+    
     if (!document.cookie) {
       // document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
       document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
