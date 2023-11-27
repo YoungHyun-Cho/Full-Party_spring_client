@@ -743,30 +743,32 @@ export default function Post() {
   };
 
   const validationCheck = () => {
-    if (partyInfo.startDate > partyInfo.endDate) {
+
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+
+    const formattedToday = `${year}-${month}-${day}`;
+
+    console.log(partyInfo.startDate)
+    console.log(partyInfo.endDate)
+    console.log(formattedToday)
+    console.log(partyInfo.endDate < formattedToday)
+
+    if (partyInfo.startDate > partyInfo.endDate || partyInfo.endDate < formattedToday) {
+
       setIsEndDate({
         err: true,
-        msg: '종료일이 시작일보다 빠를 수 없습니다.'
+        msg: '퀘스트 기간을 올바르게 입력해주세요.'
       });
+
     }
     else {
       setIsStrDate({
         err: false,
         msg: '',
       });
-      setIsEndDate({
-        err: false,
-        msg: ''
-      });
-    }
-
-    if (partyInfo.startDate > partyInfo.endDate) {
-      setIsEndDate({
-        err: true,
-        msg: '종료일이 시작일보다 빠를 수 없습니다.'
-      });
-    }
-    else {
       setIsEndDate({
         err: false,
         msg: ''
@@ -861,7 +863,7 @@ export default function Post() {
     if (partyInfo.startDate === '') {
       setIsStrDate({
         err: true,
-        msg: '퀘스트 시작하는 날을 선택해주세요.'
+        msg: '퀘스트가 시작되는 날을 선택해주세요.'
       });
     }
     else {
@@ -936,59 +938,12 @@ export default function Post() {
     }
   };
 
-  // const postParty = async () => {
-
-    // return await axios.post(`${process.env.REACT_APP_API_URL}/parties`, {
-    //   name: partyInfo.name,
-    //   image: partyInfo.image,
-    //   memberLimit: partyInfo.memberLimit,
-    //   content: partyInfo.content,
-    //   region:
-    //     isOnline?
-    //     signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
-    //     : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
-    //   location: partyInfo.location,
-    //   coordinates: isOnline? {lat: 0, lng: 0} : partyInfo.coordinates,
-    //   startDate: partyInfo.startDate,
-    //   endDate: partyInfo.endDate,
-    //   isOnline: isOnline,
-    //   privateLink: partyInfo.privateLink,
-    //   tags
-    // }, {
-    //   headers, withCredentials: true
-    // });
-
-  //   return await sendRequest(
-  //     HttpMethod.POST,
-  //     `${process.env.REACT_APP_API_URL}/parties`,
-  //     {
-  //       name: partyInfo.name,
-  //       image: partyInfo.image,
-  //       memberLimit: partyInfo.memberLimit,
-  //       content: partyInfo.content,
-  //       region:
-  //         isOnline?
-  //         signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
-  //         : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
-  //       location: partyInfo.location,
-  //       coordinates: isOnline? {lat: 0, lng: 0} : partyInfo.coordinates,
-  //       startDate: partyInfo.startDate,
-  //       endDate: partyInfo.endDate,
-  //       isOnline: isOnline,
-  //       privateLink: partyInfo.privateLink,
-  //       tags
-  //     }
-  //   );
-  // }
-
   useEffect(() => {
     validationCheck();
   }, [ partyInfo.startDate, partyInfo.endDate, partyInfo.privateLink ]);
 
   useEffect(() => {
     if (isPosted){
-
-      console.log(tags);
 
       (async () => {
         const response = await sendRequest(
@@ -1030,22 +985,6 @@ export default function Post() {
 
       })();
 
-
-      // postParty()
-      // .then((res) => {
-      //   setIsPosted(false);
-      //   // navigate(`../party/${res.data.newParty.id}`); 
-      //   console.log(res.headers.location);
-      //   const matches = res.headers.location.match(/\d+$/);
-      //   const partyId = matches ? matches[0] : -1;
-      //   navigate(`../party/${partyId}`);// 헤더에 설정된 Location값으로 리디렉션
-
-      // })
-      // .catch((err) => {
-      //   console.log(err);
-      //   setIsErrorModalOpen(true);
-      //   setIsPosted(false);
-      // });
     }
   }, [ isPosted ]);
 

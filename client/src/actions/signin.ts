@@ -14,71 +14,34 @@ export const fetchUserdata = (userInfo: UserInfo) => async (dispatch: Dispatch<U
   setCookie("signupType", "general");
   setCookie("isLoggedIn", "1");
 
-  const headers: Headers = {};
-
-  await sendRequest(
+  const response = await sendRequest(
     HttpMethod.POST,
     `${process.env.REACT_APP_API_URL}/auth/signin`, 
     userInfo
-  )
-  .then((res) => {
-    if (res.status === 200) {
+  );
 
-      // headers.Authorization = res.headers['authorization'];
-      // headers.Refresh = res.headers['refresh'];
+  if (response.status === 200) {
 
-      // document.cookie = `token=${res.headers['authorization']}`; // -> 쿠키에 토큰 저장 완료..
-      // document.cookie = `refresh=${res.headers['refresh']}`; // 서버에서 setCookie 해줌 -> 여기서 할 필요 없음. 
+    setSessionStorage({ ...response.data });
 
-      // sessionStorage.setItem("id", res.data.id);
-      // sessionStorage.setItem("email", userInfo.email);
-      // sessionStorage.setItem("userName", res.data.userName);
-      // sessionStorage.setItem("profileImage", res.data.profileImage);
-      // sessionStorage.setItem("address", res.data.address);
+    dispatch({
+      type: SIGNIN_SUCCESS,
+      payload: response.data
+    });
+    dispatch({
+      type: CLOSE_MODAL
+    });
+  }
 
-      setSessionStorage({ ...res.data });
-
-      dispatch({
-        type: SIGNIN_SUCCESS,
-        payload: res.data
-      });
-      dispatch({
-        type: CLOSE_MODAL
-      });
-    }
-  })
-  .catch((err) => {
-    if (err.response && err.response.status === 404) {
+  else {
+    if (response.status === 404) {
       dispatch({
         type: SIGNIN_FAIL
       });
+      return 404;
     }
     else {
-      console.log(err);
+      console.log(response);
     }
-  });
-
-  // // 백엔드의 getInitialUserInfo 호출
-  // await axios.get(`${process.env.REACT_APP_API_URL}/users`, { headers })
-  // .then(res => {
-  //   console.log(res.data);
-
-  //     dispatch({
-  //       type: SIGNIN_SUCCESS,
-  //       payload: res.data
-  //     });
-  //     dispatch({
-  //       type: CLOSE_MODAL
-  //     });
-  // })
-  // .catch(err => {
-  //   if (err.response && err.response.status === 401) {
-  //     dispatch({
-  //       type: SIGNIN_FAIL
-  //     });
-  //   }
-  //   else {
-  //     console.log(err);
-  //   }
-  // });
+  }
 }

@@ -449,14 +449,14 @@ export default function Home() {
       <Footer>
         <div className="teamMembers">
           <div className="title">
-            코드스테이츠 34기
-            <br />파이널 프로젝트 "풀팟"
+            <br />프로젝트 "풀팟"
           </div>
-          팀원: 조범, 김아영, 정재현, 조영현
+          Made By 조범, 김아영, 정재현, 조영현 
+          <br />Refactored By 조영현
         </div>
         <div className="contact">
           <div className="title">Contact Us</div>
-          <FontAwesomeIcon icon={ faEnvelope } className="icon" />gmfullparty@gmail.com
+          <FontAwesomeIcon icon={ faEnvelope } className="icon" />psyhyun1030@gmail.com
           <br /><FontAwesomeIcon icon={ faCodeBranch } className="icon" /><a href="https://github.com/codestates/Full_Party_pro/wiki" target="_blank" rel="noreferrer">github.com/codestates/Full_Party_pro</a>
         </div>
       </Footer>

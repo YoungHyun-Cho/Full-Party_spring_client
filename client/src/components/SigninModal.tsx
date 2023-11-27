@@ -10,7 +10,7 @@ import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
 import { CLOSE_MODAL } from '../actions/modalType';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
-import { HttpMethod, sendRequest, setSessionStorage } from '../App';
+import { HttpMethod, SignUpType, sendRequest, setSessionStorage } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -195,15 +195,6 @@ export default function SigninModal() {
     });
   };
 
-  const handleSignin = () => {
-    dispatch(fetchUserdata(userInfo))
-    if (signinReducer.isLoggedIn) {
-      dispatch({
-        type: CLOSE_MODAL
-      });
-    }
-  };
-
   const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     dispatch(modalChanger(e.currentTarget.className))
   };
@@ -212,26 +203,25 @@ export default function SigninModal() {
     dispatch(modalChanger(e.currentTarget.className))
   };
 
-  const googleLoginHandler = async () => {
-    // const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`;
-    // window.location.assign(url);
+  const loginHandler = (signUpType: SignUpType) => {
+    
+    if (signUpType === SignUpType.NORMAL) normalLoginHandler();
+    else if (signUpType === SignUpType.GUEST) guestLoginHandler(); 
+    else socialLoginHandler(signUpType);
+  }
 
-    // const response = await axios.get(
-    //   "https://localhost:8080/oauth2/authorization/google"
-    // );
-
-    // window.location.href = "https://localhost:8080/oauth2/authorization/google";
-    window.location.href = `${process.env.REACT_APP_API_URL}/oauth2/authorization/google`;
-
-    // console.log(response);
+  const socialLoginHandler = (signUpType: SignUpType) => {
+    window.location.href = `${process.env.REACT_APP_API_URL}/oauth2/authorization/${signUpType}`;
   };
 
-  const kakaoLoginHandler = () => {
-    // const url = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`;
-    // window.location.assign(url);
+  const normalLoginHandler = () => {
 
-    // window.location.href = "https://localhost:8080/oauth2/authorization/kakao";
-    window.location.href = `${process.env.REACT_APP_API_URL}/oauth2/authorization/kakao`;
+    dispatch(fetchUserdata(userInfo))
+    if (signinReducer.isLoggedIn) {
+      dispatch({
+        type: CLOSE_MODAL
+      });
+    }
   };
 
   const guestLoginHandler = async () => {
@@ -244,14 +234,15 @@ export default function SigninModal() {
 
     setSessionStorage({ ...response.data });
 
-    const payload = response.data;
     dispatch({
       type: SIGNIN_SUCCESS,
-      payload
+      payload: response.data
     });
+
     dispatch({
       type: CLOSE_MODAL
     });
+
     document.cookie = `signupType=guest; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
 
@@ -291,7 +282,7 @@ export default function SigninModal() {
           </section>
           {signinReducer.isLoggedIn === false ? <div className='notUser'>입력하신 아이디 혹은 비밀번호가 유효하지 않습니다.</div> : <span />}
           <footer>
-            <button className='signinBtn' onClick={handleSignin}>
+            <button className='signinBtn' onClick={() => loginHandler(SignUpType.NORMAL)}>
               Press Start
             </button>
             <section className='toSignup'>
@@ -303,16 +294,16 @@ export default function SigninModal() {
                 <hr /> OR <hr />
               </div>
               <button 
-                onClick={guestLoginHandler} 
+                onClick={() => loginHandler(SignUpType.GUEST)} 
                 className="oauth guest"
                 id="guest"  
               >
                 <img src="img/fullparty_symbol.png" />
               </button>
-              <button onClick={kakaoLoginHandler} className="oauth kakao">
+              <button onClick={() => loginHandler(SignUpType.KAKAO)} className="oauth kakao">
                 <img src="img/kakao_symbol.svg" />
               </button>
-              <button onClick={googleLoginHandler} className="oauth google">
+              <button onClick={() => loginHandler(SignUpType.GOOGLE)} className="oauth google">
                 <img src="img/google_symbol.svg" />
               </button>
             </div>

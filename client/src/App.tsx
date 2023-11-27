@@ -32,6 +32,13 @@ declare global {
   }
 };
 
+export enum SignUpType {
+  NORMAL = "normal",
+  GOOGLE = "google",
+  KAKAO = "kakao",
+  GUEST = "guest"
+}
+
 export type Coordinates = {
   lat: number, lng: number 
 };
@@ -55,37 +62,12 @@ export type Header = {
   withCredentials: boolean;
 }
 
-export const requestKeepLoggedIn = async (token: string, signupType: string) => {
-  // const response = await axios.post(`${process.env.REACT_APP_API_URL}/keeping`, {}, {
-  //   headers: {
-  //     access_token: token,
-  //     signup_type: signupType
-  //   }
-  // });
-  // return response;
-};
-
-// export const headers: Header = {
-//   Authorization: "Bearer " + cookieParser()["token"],
-//   Refresh: cookieParser()["refresh"],
-//   withCredentials: true
-// };
-
 export enum HttpMethod {
   POST,
   PATCH, 
   GET, 
   DELETE
 }
-
-// export const checkResponse = async (res: AxiosResponse, ) => {
-//   if (res.status === 401) {
-//     const res2 = await axios.post(`${process.env.REACT_APP_API_URL}/auth/refresh`);
-//     if (res2.status === 200) return true;
-//     else return false;
-//   }
-//   else return true;
-// };
 
 export const getHeaders = () => {
 
@@ -133,10 +115,9 @@ export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any
       case HttpMethod.GET:    response = await axios.get(url, headers); break;
       case HttpMethod.DELETE: response = await axios.delete(url, headers); break;
     }
-
-    // if (response.status === 401) throw new Error();
   }
   catch(error : any) {
+    response = error.response;
     if (error.response.status === 401) {
 
       headers.headers.Authorization = "temp";
@@ -149,7 +130,6 @@ export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any
       catch(e: any) {
         console.log(e.response);
         if (e.response.status === 401) {
-          // 리프레시 토큰 만료 -> 로그아웃 처리
 
           await axios.post(`${process.env.REACT_APP_API_URL}/auth/signout`, {});
 

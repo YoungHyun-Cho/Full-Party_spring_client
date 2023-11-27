@@ -417,19 +417,30 @@ export default function SignupModal() {
   const searchHandler = (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => setIsSearch(!isSearch);
 
   const mailVerification = async () => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mails/verification`, {
-      email: userInfo.email }
+
+    const response = await sendRequest(
+      HttpMethod.POST,
+      `${process.env.REACT_APP_API_URL}/mails/verification`,
+      { email: userInfo.email }
     );
-    // }, { withCredentials: true });
-    console.log(res);
-    setIsSent(true);
-    setVerificationData({ email: userInfo.email, code: res.data.code });
-    setTimeout(handleCodeExpire, 1000 * 60 * 5);
+
+    if (response.status === 409) {
+      setIsError({
+        ...isError,
+        isAxios: true,
+        emailMsg: '이미 가입된 이메일 주소입니다.'
+      });
+    }
+
+    else {
+      setIsSent(true);
+      setVerificationData({ email: userInfo.email, code: response.data.code });
+      setTimeout(handleCodeExpire, 1000 * 60 * 5);
+    }
   };
 
   const codeVerification = () => {
 
-    // if (userInfo.email === verificationData.email && verificationData.code === inputCode) {
     if (verificationData.code + "" === inputCode + "") {
       setPageIdx(pageIdx + 1);
       setIsError({
@@ -500,6 +511,11 @@ export default function SignupModal() {
 
       setIsRequested(true);
 
+      console.log(        {
+        userName: name, profileImage, email, password, 
+        birth, gender, mobile, address, coordinates
+      });
+
       await sendRequest(
         HttpMethod.POST,
         `${process.env.REACT_APP_API_URL}/users`,
@@ -507,26 +523,40 @@ export default function SignupModal() {
           userName: name, profileImage, email, password, 
           birth, gender, mobile, address, coordinates
         }
-      )
-      .then((res) => {
-        if (res.data.message === 'Already Signed Up') {
-          setIsError({
-            ...isError,
-            isAxios: true,
-            axiosMsg: '이미 가입된 이메일 주소입니다.'
-          })
-        }
-        else dispatch(modalChanger('signinModalBtn'));
-        setIsRequested(false);
-      })
-      .catch((err) => console.log(err))
+      );
+      dispatch(modalChanger('signinModalBtn'));
+      setIsRequested(false);
     }
   };
 
-  const handlePageChange = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const toGo = (event.currentTarget as HTMLButtonElement).value;
+  const changePageIndex = (toGo: string) => {
     if (toGo === "next") setPageIdx(pageIdx + 1);
     else setPageIdx(pageIdx - 1);
+  };
+
+  const handlePageChange = async (event: React.MouseEvent<HTMLButtonElement>) => {
+
+    const toGo = (event.currentTarget as HTMLButtonElement).value;
+
+    if (pageIdx === 2) {
+      const response = await sendRequest(
+        HttpMethod.POST,
+        `${process.env.REACT_APP_API_URL}/users/name?user_name=${userInfo.name}`,
+        {}
+      );
+  
+      if (response.status === 409) {
+        setIsError({
+          ...isError,
+          isAxios: true,
+          nameMsg: '이미 사용 중인 닉네임입니다.'
+        });
+      }
+
+      else changePageIndex(toGo);
+    }
+
+    else changePageIndex(toGo);
   };
 
   const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
