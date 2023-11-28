@@ -48,16 +48,10 @@ export default function Auth() {
 
 
   useEffect(() => {
-    // const address = new URL(window.location.href).searchParams.get("code");
-    // if (address && address[1] !== "/") handleKakaoLogin();
-    // else if (address && address[1] === "/") handleGoogleLogin();
 
     const signUpType = new URL(window.location.href).searchParams.get("sign_up_by");
-
-    // if (signUpType === "google") handleGoogleLogin();
-    // if (signUpType === "kakao") handleKakaoLogin();
-
     handleSocialLogin(signUpType as string);
+    
   }, []);
 
   const searchParams = (name: string) => new URL(window.location.href).searchParams.get(name) + "";

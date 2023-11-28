@@ -51,7 +51,7 @@ export const signout = async (req: Request, res: Response) => {
 export const signup = async (req: Request, res: Response) => {
   try {
     const { userInfo } = req.body;
-    const result = await createUser({ ...userInfo, signupType: "general" });
+    const result = await createUser({ ...userInfo, signupType: "normal" });
     if (result) return SuccessfulResponse(res, { message: "Welcome!" });
     return FailedResponse(res, 409, "Already Signed Up");
   }
@@ -201,7 +201,7 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
   try {
     const accessToken = req.headers.access_token;
     const signupType = req.headers.signup_type;
-    if (signupType === "general") {
+    if (signupType === "normal") {
       const verification = verifyAccessToken(String(accessToken));
       if (!verification) FailedResponse(res, 403, "Invalid access token");
       else if (typeof verification !== "string") {

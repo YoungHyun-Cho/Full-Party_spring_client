@@ -58,11 +58,6 @@ export default function List() {
     if (userInfo.address !== "google" && userInfo.address !== "kakao" && userInfo.address !== "guest") {
       setIsLoading(true);
 
-      const headers: Headers = {
-        Authorization: "Bearer " + cookieParser()["token"],
-        Refresh: cookieParser()["refresh"]
-      };
-
       const searchRegion = userInfo.address.split(" ")[0] + " " + userInfo.address.split(" ")[1];
 
       (async () => {
@@ -92,10 +87,6 @@ export default function List() {
     setIsLoading(false);
   }, [ userInfo ]);
 
-  // useEffect(() => {
-  //   setIsLoading(false);
-  // }, [ localParties, myParties ]);
-
   if (isLoading) return <Loading />
 
   if (!userInfo.address || userInfo.address === 'guest' || userInfo.address === "google" || userInfo.address === "kakao")
@@ -105,7 +96,6 @@ export default function List() {
 
   return (
     <ListContainer>
-      {/* {console.log("myparties : " + myParties)} */}
       {myParties.length > 0 ?
         <section className="listSection">
           <header className="listHeader">
@@ -116,10 +106,8 @@ export default function List() {
           </main>
         </section>
       : null}
-      {/* {console.log("localparties : " + localParties)} */}
       {localParties.length > 0 ?
         <LocalQuest location={userInfo.address} coordinates={coordinates} localParty={localParties} />
-        // <LocalQuest location={searchRegion} localParty={localParties} />
         : <EmptyCard from="list" />}
     </ListContainer>
   );

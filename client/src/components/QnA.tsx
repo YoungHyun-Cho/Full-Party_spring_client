@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import CommentDeleteModal from './CommentDeleteModal';
-import axios from 'axios';
+import { SignUpType } from '../App';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
-import { HttpMethod, sendRequest } from '../App';
+import { HttpMethod, cookieParser, sendRequest } from '../App';
 
 export const QnAContainer = styled.section`
   header {
@@ -171,6 +171,9 @@ type Props = {
 };
 
 export default function QnA ({ partyId, isLeader, leaderId, comments, findComment }: Props) {
+
+  const signupType: SignUpType | undefined = Object.values(SignUpType).find(value => value === cookieParser()["signupType"]);
+
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector(
@@ -207,11 +210,6 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
   };
 
   const postHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    // await axios.post(`${process.env.REACT_APP_API_URL}/comments`, {
-    //   userId,
-    //   partyId,
-    //   content: newComment.comment
-    // }, { withCredentials: true });
 
     await sendRequest(
       HttpMethod.POST,
@@ -227,9 +225,6 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
   };
 
   const replyHandler = async (event: React.MouseEvent<HTMLButtonElement>, commentId:number) => {
-    // await axios.post(`${process.env.REACT_APP_API_URL}/comments/${commentId}/reply`, {
-    //   userId, commentId, content: newComment.subcomment
-    // }, { withCredentials: true });
 
     await sendRequest(
       HttpMethod.POST,
@@ -338,6 +333,12 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
                         <div key={idx} className="subcommentList">
                           <div className="profileContainer">
                             <div className="profileImage" style={{ backgroundImage: `url(${subcomment.profileImage})`, backgroundSize: "cover" }} />
+                            {/* <img
+                              className="profileImage"
+                              src={subcomment.profileImage}
+                              alt="User Profile Image"
+                              style={{objectFit: "cover" }}
+                            /> */}
                             <div className="nameplate">{subcomment.userName}</div>
                           </div>
                           <div className="subCommentContainer" style={{ border: "1px solid #d5d5d5" }}>

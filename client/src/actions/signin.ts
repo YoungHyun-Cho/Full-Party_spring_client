@@ -11,7 +11,7 @@ type UserInfo = {
 
 export const fetchUserdata = (userInfo: UserInfo) => async (dispatch: Dispatch<UserInfoDispatchType>) => {
   
-  setCookie("signupType", "general");
+  setCookie("signupType", "normal");
   setCookie("isLoggedIn", "1");
 
   const response = await sendRequest(

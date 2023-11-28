@@ -70,12 +70,15 @@ export const InfoWrapper = styled.div`
     display: flex;
   }
 
-  .leaderProfile {
+  .partyProfile {
     width: 50px;
     height: 50px;
     border: 1px solid #d5d5d5;
     border-radius: 100%;
     margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .infoContainer {
@@ -222,10 +225,15 @@ export default function QuestCard ({ party }: Props) {
       <main>
         <InfoWrapper>
           <div className="infoHeader">
-            <div
-              className="leaderProfile"
-              // style={{ backgroundImage: `url(${memberList[0].profileImage})`, backgroundSize: "cover" }}
+            {/* <div
+              className="partyProfile"
               style={{ backgroundImage: `url(${party.image})`, backgroundSize: "cover" }}
+            /> */}
+            <img
+              className="partyProfile"
+              src={party.image}
+              alt="Party Profile"
+              style={{ width: "50px", height: "50px", border: "1px solid #d5d5d5", borderRadius: "50%", marginRight: "10px", objectFit: "cover" }}
             />
             <div className="infoContainer">
               <div className="title">

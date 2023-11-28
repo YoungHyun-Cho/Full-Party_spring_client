@@ -122,7 +122,7 @@ export default function UserMap({ profileImage, address }: Props) {
           position={coords}
           yAnchor={2.4}
         >
-          <div className="partyImg" style={{background: `url(${IMAGE_SERVER_URL}/${profileImage})`, backgroundPosition: "center", backgroundSize: "cover"}} />
+          <div className="partyImg" style={{background: `url(${profileImage})`, backgroundPosition: "center", backgroundSize: "cover"}} />
         </CustomOverlayMap>
         <CustomOverlayMap
           position={coords}

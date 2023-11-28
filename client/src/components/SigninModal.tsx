@@ -222,6 +222,8 @@ export default function SigninModal() {
         type: CLOSE_MODAL
       });
     }
+
+    navigate('/home');
   };
 
   const guestLoginHandler = async () => {

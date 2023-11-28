@@ -757,7 +757,8 @@ export default function Mypage() {
         setBasicInfo({
           userName: userInfo.userName,
           // profileImage: IMAGE_SERVER_URL + `/${userInfo.profileImage}`, 
-          profileImage: userInfo.profileImage.startsWith("http") ? userInfo.profileImage : IMAGE_SERVER_URL + `/${userInfo.profileImage}`,
+          // profileImage: userInfo.profileImage.startsWith("http") ? userInfo.profileImage : IMAGE_SERVER_URL + `/${userInfo.profileImage}`,
+          profileImage: userInfo.profileImage,
           address: userInfo.address,
           level: userInfo.level,
           exp: userInfo.exp,
@@ -797,7 +798,6 @@ export default function Mypage() {
       <MypageHeader>
         <div className="leftWrapper">
           <div className='profileImageContainer'>
-            {/* {console.log(basicInfo)} */}
             <img
               src={basicInfo.profileImage ? basicInfo.profileImage : 'https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com/defaultProfile.png'}
               alt='thumbnail'
@@ -862,7 +862,7 @@ export default function Mypage() {
                         <div className='error'>{isError.nameMsg}</div>
                       </td>
                     </tr>
-                    {signupType === 'general' ?
+                    {signupType === 'normal' ?
                       <>
                         <tr>
                           <td className='label'>비밀번호</td>
@@ -965,7 +965,7 @@ export default function Mypage() {
           } else {
             return(
               <div className='btns'>
-                <button onClick={signupType === 'general' ? verficationModalHandler : handleIsChange}>
+                <button onClick={signupType === 'normal' ? verficationModalHandler : handleIsChange}>
                   개인 정보 수정
                 </button>
                 <button onClick={(e) => userCancelHandler(e, "signout")}>

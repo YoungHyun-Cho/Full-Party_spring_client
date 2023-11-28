@@ -480,9 +480,6 @@ export default function Party() {
   };
 
   const cancelHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    // await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/application`, {
-    //   headers, withCredentials: true
-    // });
 
     await sendRequest(
       HttpMethod.DELETE,
@@ -501,7 +498,6 @@ export default function Party() {
   };
 
   const quitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    // await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/participation/${userId}`);
 
     await sendRequest(
       HttpMethod.DELETE,
@@ -519,24 +515,7 @@ export default function Party() {
     });
   };
 
-  // const partyStateHandler = async (event: React.MouseEvent<HTMLButtonElement>, state: string) => {
-
-  //   const res = await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/states`, 
-  //   { partyState: "모집 완료" }, 
-  //   { headers, withCredentials: true });
-  //   console.log(res);
-  //   if (res.status === 200) {
-  //     setPartyInfo({
-  //       ...partyInfo,
-  //       partyState: "모집 완료"
-  //     });
-  //   }
-  // };
-
   const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    // const res = await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/state?party_state=fullparty`, 
-    // { partyState: "모집 완료" }, 
-    // { headers, withCredentials: true });
 
     const response = await sendRequest(
       HttpMethod.PATCH,
@@ -554,8 +533,7 @@ export default function Party() {
   };
 
   const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    // const res = await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/state?party_state=모집 중`, 
-    // {});
+    
     const response = await sendRequest(
       HttpMethod.PATCH,
       `${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/state?party_state=모집 중`,
@@ -592,6 +570,7 @@ export default function Party() {
         console.log(response);
         setPartyInfo({ ...response.data });
         setComments(response.data.comments);
+        console.log(response);
         dispatch({
           type: NOTIFY,
           payload: {
@@ -606,30 +585,6 @@ export default function Party() {
       }
 
     })();
-    // sendRequest(
-    //   HttpMethod.GET,
-    //   `${process.env.REACT_APP_API_URL}/parties/${params.partyId}`,
-    //   null
-    // );
-    // .then(res => {
-    //   console.log(res);
-    //   setPartyInfo({ ...res.data });
-    //   setComments(res.data.comments);
-    //   dispatch({
-    //     type: NOTIFY,
-    //     payload: {
-    //       isBadgeOn: res.data.notification
-    //     }
-    //   });
-    // })
-    // .catch(err => {
-    //   console.log(err);
-    //   if (err.response.status === 404) {
-    //     setNotFound(true);
-    //     setIsLoading(false);
-    //   }
-    // });
-
 
     setIsLoading(false);
   }, [ params ]);
@@ -790,7 +745,6 @@ export default function Party() {
               latlng={partyInfo.coordinates}
               image={partyInfo.image}
             />  
-            {/* {!isMember? "파티원에게는 더 정확한 장소가 표시됩니다." : null} */}
           </div> 
         : null}
 

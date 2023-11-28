@@ -86,12 +86,12 @@ export default function LocalMap({ coordinates, localParty }: Props) {
   };
 
   const EventMarkerContainer = ({ party }: p) => {
+    
     const [isVisible, setIsVisible] = useState(false);
 
     return (
       <>
         <MapMarker
-          // position={party.latlng}
           position={party.coordinates}
           image={{
             src: "img/mapMarker.png",
@@ -103,7 +103,6 @@ export default function LocalMap({ coordinates, localParty }: Props) {
           onMouseOut={() => setIsVisible(false)}
         />
         <CustomOverlayMap
-          // position={party.latlng}
           position={party.coordinates}
           yAnchor={3.1}
         >
@@ -115,9 +114,8 @@ export default function LocalMap({ coordinates, localParty }: Props) {
           />
         </CustomOverlayMap>
 
-        {isVisible?
+        {isVisible ?
           <CustomOverlayMap
-            // position={party.latlng}
             position={party.coordinates}
           >
             <div className="infoWindow">
@@ -132,20 +130,7 @@ export default function LocalMap({ coordinates, localParty }: Props) {
   }
 
   useEffect(() => {
-    
-    // geocoder.addressSearch(location, (result: any, status: any) => {
-    //   console.log(location)
-    //   console.log(status)
-    //   if (status === kakao.maps.services.Status.OK) {
-    //     const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
-    //     const { La, Ma } = coordinates;
-    //     setCoords({ lat: Ma, lng: La });
-    //     console.log(La, Ma)
-    //   }
-    // });
-
     setCoords(coordinates);
-
   }, [ localParty ]);
 
   return (

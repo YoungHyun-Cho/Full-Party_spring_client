@@ -178,15 +178,10 @@ export default function App() {
 
     // 로그인 유지
     else if (token !== "temp" && signupType !== "temp" && isLoggedIn !== "0") {
-      // requestKeepLoggedIn(token, signupType).then((res) => {
+      
       dispatch({
         type: SIGNIN_SUCCESS,
-      //   // payload: res.data.userInfo
       });
-      // });
-
-      // headers.Authorization = "Bearer " + cookieParser()["token"];
-      // headers.Refresh = cookieParser()["refresh"];
     }
 
     if (isLoggedIn === "2") {

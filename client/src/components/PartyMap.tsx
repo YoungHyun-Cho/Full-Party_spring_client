@@ -74,7 +74,7 @@ type Props = {
 };
 
 export default function PartyMap({ isMember, latlng, image }: Props) {
-  const { kakao } = window;
+
   const [ coords, setCoords ] = useState(latlng);
   const { lat: lat, lng: lng } = coords;
   const level = (isMember ? 4 : 5);
@@ -101,33 +101,22 @@ export default function PartyMap({ isMember, latlng, image }: Props) {
                 src: "img/mapMarker.png",
                 size: { width: 50, height: 50 },
                 options: { offset: { x: 24.15, y: 69 } },
-              }}
-            />
+              }}>
+
+            </MapMarker>
             <CustomOverlayMap
               position={coords}
-              yAnchor={2.4}
+              yAnchor={2.15}
             >
-              <div className="partyImg" style={{background: `url(${image})`, backgroundSize: "cover", backgroundPosition: "center"}} />
+              <img className="partyImg" src={image} alt="Party Image" style={{objectFit: "cover" }} />
             </CustomOverlayMap>
           </>
-        {/* :
-          <Circle
-            center={coords}
-            radius={500}
-            strokeWeight={1}
-            strokeColor={"#50C9C3"}
-            strokeOpacity={0.5}
-            fillColor={"#50C9C3"}
-            fillOpacity={0.4}
-          /> */}
-        {/* } */}
+        :
         <CustomOverlayMap
-          // position={isMember ? coords : { lat: lat - 0.0035, lng: lng + 0.0005}}
           position={coords}
           yAnchor={1}
         >
           <div className="infoWindow">
-            {/* {isMember ?  */}
               <a
                 href={`https://map.kakao.com/link/map/퀘스트장소,${lat},${lng}`}
                 target="_blank"
@@ -135,11 +124,6 @@ export default function PartyMap({ isMember, latlng, image }: Props) {
               >
                 <span className="title">퀘스트 장소</span>
               </a>
-            {/* : */}
-              {/* <a href="#" onClick={e => e.preventDefault()}>
-                <span className="title">퀘스트 장소</span>
-              </a> */}
-            {/* } */}
           </div>
         </CustomOverlayMap>
       </Map>

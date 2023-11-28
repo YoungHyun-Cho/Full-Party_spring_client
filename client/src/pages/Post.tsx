@@ -742,14 +742,13 @@ export default function Post() {
     return year + "-" + (month < 10 ? `0${month}` : `${month}`) + "-" + date;
   };
 
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const formattedToday = `${year}-${month}-${day}`;
+
   const validationCheck = () => {
-
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-
-    const formattedToday = `${year}-${month}-${day}`;
 
     console.log(partyInfo.startDate)
     console.log(partyInfo.endDate)
