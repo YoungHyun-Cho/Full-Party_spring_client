@@ -10,7 +10,7 @@ import PostCodeModal from '../components/PostCodeModal';
 import EmptyParty from '../components/EmptyParty';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { cookieParser, Coordinates, Headers, HttpMethod, sendRequest, setCookie } from "../App";
+import { changeToSignOutState, cookieParser, Coordinates, Headers, HttpMethod, sendRequest, setCookie } from "../App";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { NOTIFY } from "../actions/notify";
@@ -654,17 +654,6 @@ export default function Mypage() {
     else if (e.currentTarget.value === 1) filterParticipatingParties();
     else if (e.currentTarget.value === 2) filterCompletedParties();
     setCurTab(e.currentTarget.value);
-  };
-
-  const changeToSignOutState = () => {
-    
-    dispatch({ type: SIGNIN_FAIL });
-    
-    setCookie("signupType", "temp");
-    setCookie("isLoggedIn", "0");
-    sessionStorage.clear();
-
-    navigate("/");
   };
 
   const handleSignOut = async () => {

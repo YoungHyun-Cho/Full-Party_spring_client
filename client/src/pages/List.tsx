@@ -8,7 +8,7 @@ import EmptyCard from '../components/EmptyCard';
 import AddressModal from '../components/AddressModal';
 import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Headers, HttpMethod, sendRequest } from "../App";
+import { Headers, HttpMethod, cookieParser, sendRequest } from "../App";
 import { AppState } from '../reducers';
 import { NOTIFY } from '../actions/notify';
 
@@ -32,14 +32,6 @@ export const ListContainer = styled.div`
     }
   }
 `;
-
-const cookieParser = () => {
-  const cookieString = document.cookie.split("; ");
-  const keyAndValue = cookieString.map(item => item.split("="));
-  let cookieObject: { [key: string]: string } = {};
-  keyAndValue.map((item, i) => cookieObject[item[0]] = item[1]);
-  return cookieObject;
-};
 
 export default function List() {
   const dispatch = useDispatch();

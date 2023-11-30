@@ -20,7 +20,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from './reducers';
 import { RootReducerType } from './store/store';
-import { SIGNIN_FAIL, SIGNIN_SUCCESS } from './actions/signinType';
+import { SIGNIN_FAIL, SIGNIN_SUCCESS, UserInfoDispatchType } from './actions/signinType';
+import { Dispatch } from 'redux';
 
 declare global {
   interface Window {
@@ -89,13 +90,17 @@ export const setSessionStorage = ({ id, email, userName, profileImage, address }
   sessionStorage.setItem("address", checkValue("address", address));
 };
 
-export const setCookie = (name: string, value: any) => {
-  document.cookie = `${name}=${value}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+export const setCookie = (name: string, value: any, option?: string) => {
+  document.cookie = `${name}=${value}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/; ${option}`;
+};
+
+export const setTokenCookie = (name: string, value: any, maxAge: number) => {
+  setCookie(name, value, `max-age=${maxAge};`);
 };
 
 export const setAllCookie = (signUpType: string, isLoggedIn: string, accessToken: string, refreshToken: string) => {
-  setCookie("token", accessToken);
-  setCookie("refresh", refreshToken);
+  setTokenCookie("token", accessToken, 10 * 60);
+  setTokenCookie("refresh", refreshToken, 30 * 60);
   setCookie("signupType", signUpType);
   setCookie("isLoggedIn", isLoggedIn);
 };
@@ -125,13 +130,9 @@ export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any
         else console.log(refreshResult);
       }
       catch(e: any) {
-        console.log(e.response);
+        
         if (e.response.status === 401) {
-
-          await axios.post(`${process.env.REACT_APP_API_URL}/auth/signout`, {});
-
-          setCookie("isLoggedIn", "2");
-          window.location.href = `${process.env.REACT_APP_CLIENT_URL}/`;
+          changeToSignOutState();
         }
       }
     }
@@ -140,9 +141,23 @@ export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any
   return response;
 };
 
+let dispatcher: Dispatch<UserInfoDispatchType>;
+
+export const changeToSignOutState = () => {
+  
+  dispatcher({ type: SIGNIN_FAIL });
+  
+  setCookie("signupType", "temp");
+  setCookie("isLoggedIn", "0");
+  sessionStorage.clear();
+
+  window.location.href = `${process.env.REACT_APP_CLIENT_URL}/`;
+};
+
 export default function App() {
 
   const dispatch = useDispatch();
+  dispatcher = dispatch;
 
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
@@ -155,8 +170,8 @@ export default function App() {
     if (!Kakao.isInitialized()) initialize();
     
     if (!document.cookie) {
-      document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-      document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      setCookie("signupType", "temp");
+      setCookie("isLoggedIn", "0");
     }
     const { token, signupType, isLoggedIn } = cookieParser();
 
