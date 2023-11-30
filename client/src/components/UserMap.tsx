@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
-import { IMAGE_SERVER_URL } from "../App";
 
 export const MapContainer = styled.div`
   width: 100%;

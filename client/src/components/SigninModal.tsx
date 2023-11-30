@@ -10,7 +10,7 @@ import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
 import { CLOSE_MODAL } from '../actions/modalType';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
-import { HttpMethod, SignUpType, sendRequest, setSessionStorage } from '../App';
+import { HttpMethod, SignUpType, sendRequest, setCookie, setSessionStorage } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -179,6 +179,7 @@ export const CloseBtn = styled.button`
 export default function SigninModal() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [ isTried, setIsTried ] = useState(false);
 
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
 
@@ -204,6 +205,8 @@ export default function SigninModal() {
   };
 
   const loginHandler = (signUpType: SignUpType) => {
+
+    setIsTried(true);
     
     if (signUpType === SignUpType.NORMAL) normalLoginHandler();
     else if (signUpType === SignUpType.GUEST) guestLoginHandler(); 
@@ -245,8 +248,8 @@ export default function SigninModal() {
       type: CLOSE_MODAL
     });
 
-    document.cookie = `signupType=guest; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    setCookie("signupType", "guest");
+    setCookie("isLoggedIn", "1");
 
     navigate('/home');
   };
@@ -282,7 +285,7 @@ export default function SigninModal() {
               />
             </fieldset>
           </section>
-          {signinReducer.isLoggedIn === false ? <div className='notUser'>입력하신 아이디 혹은 비밀번호가 유효하지 않습니다.</div> : <span />}
+          {isTried === true && signinReducer.isLoggedIn === false ? <div className='notUser'>입력하신 아이디 혹은 비밀번호가 유효하지 않습니다.</div> : <span />}
           <footer>
             <button className='signinBtn' onClick={() => loginHandler(SignUpType.NORMAL)}>
               Press Start

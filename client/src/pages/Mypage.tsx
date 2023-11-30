@@ -10,7 +10,7 @@ import PostCodeModal from '../components/PostCodeModal';
 import EmptyParty from '../components/EmptyParty';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { cookieParser, Coordinates, Headers, HttpMethod, IMAGE_SERVER_URL, sendRequest, setCookie } from "../App";
+import { cookieParser, Coordinates, Headers, HttpMethod, sendRequest, setCookie } from "../App";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { NOTIFY } from "../actions/notify";
@@ -440,10 +440,12 @@ export default function Mypage() {
   };
 
   const handleIsChange = async () => {
+    
     if (isChange) setIsChange(false);
+    
     else {
       setIsInfoLoading(true);
-      // const res = await axios.get(`${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}/details`);
+
       const res = await sendRequest(
         HttpMethod.GET,
         `${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}/details`,
@@ -643,29 +645,9 @@ export default function Mypage() {
     sessionStorage.setItem("address", address);
   }
 
-  const filterParticipatingParties = () => {
-    // const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`);
-    // const myParty = res.data.myParty;
-    // setParties(myParty);
-
-    setParties(relatedParties.participatingParties);
-  };
-
-  const filterLeadingParties = () => {
-    // const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`);
-    // const myParty = res.data.myParty;
-    // setParties(myParty);
-
-    setParties(relatedParties.leadingParties);
-  };
-
-  const filterCompletedParties = () => {
-    // const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completing/${signinReducer.userInfo?.id}`);
-    // const myParty = res.data.myParty;
-    // setParties(myParty);
-
-    setParties(relatedParties.completedParties);
-  };
+  const filterParticipatingParties = () => setParties(relatedParties.participatingParties);
+  const filterLeadingParties = () => setParties(relatedParties.leadingParties);
+  const filterCompletedParties = () => setParties(relatedParties.completedParties);
 
   const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     if (e.currentTarget.value === 0) filterLeadingParties();
@@ -674,47 +656,39 @@ export default function Mypage() {
     setCurTab(e.currentTarget.value);
   };
 
-  const handleSignOut = async () => {
-    // const { token, signupType } = cookieParser();
-    // await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {}, {
-    //   headers: {
-    //     access_token: token,
-    //     signup_type: signupType
-    //   }
-    // });
-
-    await sendRequest(
-      HttpMethod.POST,
-      `${process.env.REACT_APP_API_URL}/auth/signout?signup-type=${cookieParser()["signupType"]}`,
-      {}
-    );
-
-    // 서버측에서 토큰 관련 쿠키는 삭제해줌. 프론트에서는 기타 쿠키만 삭제하고, 세션 스토리지만 삭제하면 됨. 
-
+  const changeToSignOutState = () => {
+    
     dispatch({ type: SIGNIN_FAIL });
-    // document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    
     setCookie("signupType", "temp");
     setCookie("isLoggedIn", "0");
     sessionStorage.clear();
 
-    // document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    // document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    window.location.reload();
     navigate("/");
   };
 
+  const handleSignOut = async () => {
+
+    await sendRequest(
+      HttpMethod.POST,
+      `${process.env.REACT_APP_API_URL}/auth/signout`,
+      {}
+    );
+
+    changeToSignOutState();
+  };
+
   const handleWithdrawal = async () => {
-    const { token, signupType } = cookieParser();
+    
     const userId = signinReducer.userInfo?.id;
-    await axios.delete(`${process.env.REACT_APP_API_URL}/users/${userId}/${signupType}`, {
-      withCredentials : true, 
-      headers
-    });
-    dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    navigate("/");
+
+    await sendRequest(
+      HttpMethod.DELETE,
+      `${process.env.REACT_APP_API_URL}/users/${userId}`,
+      null
+    );
+
+    changeToSignOutState();
   };
 
   const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement>, from: string) => {
@@ -726,20 +700,9 @@ export default function Mypage() {
     setIsVerificationModalOpen(!isVerificationModalOpen);
   };
 
-  const handleFormatAddressChange = (address: string) => {
-    setFormatAddress(address);
-  };
-
-  const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') setFixedLocation(changeInfo.address);
-  };
-
   useEffect(() => {
     (async () => {
       if (userInfoFromStore.id >= 1) {
-        // const res = await axios.get(`${process.env.REACT_APP_API_URL}/users/${userInfoFromStore.id}`, {
-        //   withCredentials: true,
-        // });
 
         const res = await sendRequest(
           HttpMethod.GET,
@@ -756,8 +719,6 @@ export default function Mypage() {
         const userInfo = res.data;
         setBasicInfo({
           userName: userInfo.userName,
-          // profileImage: IMAGE_SERVER_URL + `/${userInfo.profileImage}`, 
-          // profileImage: userInfo.profileImage.startsWith("http") ? userInfo.profileImage : IMAGE_SERVER_URL + `/${userInfo.profileImage}`,
           profileImage: userInfo.profileImage,
           address: userInfo.address,
           level: userInfo.level,
@@ -814,7 +775,6 @@ export default function Mypage() {
           </div>
           <ProgressBar>
             <div className="barContainer">
-              {/* <div className="barFiller" style={{ width: `${Math.floor(basicInfo.exp % 20) * 5}%` }} /> */}
               <div className="barFiller" style={{ width: `${(basicInfo.exp / basicInfo.levelUpExp) * 100}%` }} />
             </div>
           </ProgressBar>

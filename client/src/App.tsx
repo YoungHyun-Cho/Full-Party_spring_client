@@ -21,9 +21,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from './reducers';
 import { RootReducerType } from './store/store';
 import { SIGNIN_FAIL, SIGNIN_SUCCESS } from './actions/signinType';
-import dotenv from "dotenv";
-import { fetchUserdata } from './actions/signin';
-import { bool } from 'aws-sdk/clients/signer';
 
 declare global {
   interface Window {
@@ -143,8 +140,6 @@ export const sendRequest = async (httpMethod: HttpMethod, url: string, body: any
   return response;
 };
 
-export const IMAGE_SERVER_URL="https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com";
-
 export default function App() {
 
   const dispatch = useDispatch();
@@ -160,7 +155,6 @@ export default function App() {
     if (!Kakao.isInitialized()) initialize();
     
     if (!document.cookie) {
-      // document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
       document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
       document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     }
@@ -168,11 +162,6 @@ export default function App() {
 
     // 탭 닫은 경우 쿠키 삭제
     if (token !== "temp" && sessionStorage.getItem("id") === null ) {
-      // document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-      // document.cookie = `refresh=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-      // document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-      // document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-
       setAllCookie("temp", "0", "temp", "temp");
     }
 

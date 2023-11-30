@@ -78,14 +78,14 @@ type Props = {
 
 export default function CommentDeleteModal({ commentDeleteModalHandler, commentToDelete, partyId }: Props) {
   const navigate = useNavigate();
-  const { idx, commentId } = commentToDelete;
-  const closeModal =() => {
+  const { idx, originalCommentId, commentElementId } = commentToDelete;
+  const closeModal = () => {
     commentDeleteModalHandler();
   };
 
   const deleteHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (idx === 0) await axios.delete(`${process.env.REACT_APP_API_URL}/party/comment/${commentId}`);
-    else await axios.delete(`${process.env.REACT_APP_API_URL}/party/subComment/${commentId}`);
+    if (idx === 0 && originalCommentId === commentElementId) await axios.delete(`${process.env.REACT_APP_API_URL}/comments/${originalCommentId}`);
+    else await axios.delete(`${process.env.REACT_APP_API_URL}/comments/${originalCommentId}/replies/${commentElementId}`);
     commentDeleteModalHandler();
     navigate(`../party/${partyId}`);
   };

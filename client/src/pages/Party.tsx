@@ -523,7 +523,6 @@ export default function Party() {
       null
     );
 
-    console.log(response);
     if (response.status === 200) {
       setPartyInfo({
         ...partyInfo,
@@ -533,7 +532,7 @@ export default function Party() {
   };
 
   const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    
+
     const response = await sendRequest(
       HttpMethod.PATCH,
       `${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}/state?party_state=모집 중`,
@@ -570,7 +569,7 @@ export default function Party() {
         console.log(response);
         setPartyInfo({ ...response.data });
         setComments(response.data.comments);
-        console.log(response);
+        
         dispatch({
           type: NOTIFY,
           payload: {
@@ -579,7 +578,7 @@ export default function Party() {
         });
       }
       else if (response.status === 404) {
-        console.log(response);
+        
         setNotFound(true);
         setIsLoading(false);
       }
@@ -783,13 +782,13 @@ export default function Party() {
             partyId={partyInfo.id}
             isLeader={isLeader}
             leaderId={partyInfo.userId}
-            comments={comments.map(comment => comment).reverse()}
+            commentsAndRepliesList={comments.map(comment => comment).reverse()}
             findComment={findComment}
           /> 
         </section>
 
         <PartyStateBtns>
-          {isLoggedIn === "0" ?
+          {isLoggedIn === "2" ?
             <div className="signinMsgContainer">
               <div className="signinMsg">
                 <b>로그인</b>해서 이 파티의 회원이 되어보세요! 🥳

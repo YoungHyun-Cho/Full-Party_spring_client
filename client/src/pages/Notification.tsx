@@ -159,7 +159,6 @@ export default function Notification() {
     if (userId !== 0.1) {
       setIsLoading(true);
       (async () => {
-        // const response = await axios.get(`${process.env.REACT_APP_API_URL}/notifications`);
         const response = await sendRequest(
           HttpMethod.GET,
           `${process.env.REACT_APP_API_URL}/notifications`,

@@ -166,13 +166,13 @@ type Props = {
   partyId: number,
   isLeader: boolean,
   leaderId: number,
-  comments: Array<{ [key: string]: any }>,
+  commentsAndRepliesList: Array<{ [key: string]: any }>,
   findComment: number
 };
 
-export default function QnA ({ partyId, isLeader, leaderId, comments, findComment }: Props) {
+export default function QnA ({ partyId, isLeader, leaderId, commentsAndRepliesList, findComment }: Props) {
 
-  const signupType: SignUpType | undefined = Object.values(SignUpType).find(value => value === cookieParser()["signupType"]);
+  console.log(commentsAndRepliesList);
 
   const navigate = useNavigate();
 
@@ -189,7 +189,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
   const [ newComment, setNewComment ] = useState({comment: "", subcomment: ""});
   const [ isCommentDeleteModalOpen, setIsCommentDeleteModalOpen ] = useState(false);
   const [ commentToDelete, setCommentToDelete ] = useState({});
-  const curComments = comments.map((comment) => [ comment.comment, ...comment.replies ])[commentIdx];
+  const curComments = commentsAndRepliesList.map((commentAndReplies) => [ commentAndReplies.comment, ...commentAndReplies.replies ])[commentIdx];
 
   const formatDate = (date: String) => date.slice(0, 10);
 
@@ -228,33 +228,34 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
 
     await sendRequest(
       HttpMethod.POST,
-      `${process.env.REACT_APP_API_URL}/comments/${commentId}/reply`,
-      { commentId, content: newComment.subcomment }
+      `${process.env.REACT_APP_API_URL}/comments/${commentId}/replies`,
+      { content: newComment.subcomment }
     );
 
     setNewComment({ ...newComment, subcomment: "" });
     navigate(`../party/${partyId}`);
   };
 
-  const commentDeleteModalHandler = (event: React.MouseEvent<HTMLButtonElement>, idx: number, commentId: number): void  => {
-    setCommentToDelete({ idx: idx, commentId: commentId });
+  const commentDeleteModalHandler = (event: React.MouseEvent<HTMLButtonElement>, idx: number, originalCommentId: number, commentElementId: number): void  => {
+    
+    setCommentToDelete({ idx, originalCommentId, commentElementId });
     setIsCommentDeleteModalOpen(!isCommentDeleteModalOpen);
   };
 
   useEffect(() => {
     if (findComment >= 0) {
-      const idx = comments.findIndex((comment) => comment.comment.id === findComment);
+      const idx = commentsAndRepliesList.findIndex((comment) => comment.comment.id === findComment);
       setCommentIdx(idx);
       setIsCommentOpen(true);
     }
-  }, [ comments ]);
+  }, [ commentsAndRepliesList ]);
 
-  if (comments.length <= 0) {
+  if (commentsAndRepliesList.length <= 0) {
     return (
       <QnAContainer>
         <header>
           <div className="title">문의하기</div>
-          {isLoggedIn ? <button className="edit" onClick={editHandler}>글쓰기</button> : null}
+          {isLoggedIn && !isLeader ? <button className="edit" onClick={editHandler}>글쓰기</button> : null}
         </header>
         {isEditMode? 
         <CommentInput className="firstComment">
@@ -275,7 +276,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
     <QnAContainer>
       <header>
         <div className="title">문의하기</div>
-        {isLoggedIn ? <button className="edit" onClick={editHandler}>글쓰기</button> : null}
+        {isLoggedIn && !isLeader ? <button className="edit" onClick={editHandler}>글쓰기</button> : null}
       </header>
 
       {isEditMode?
@@ -297,33 +298,34 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
       : null}
 
       <Comments style={{ borderTop: isEditMode? "1px solid #d5d5d5" : "none" }}>
-        {comments.map((comment, idx) =>
+        {commentsAndRepliesList.map((commentAndReplies, idx) =>
           <div className="commentsContainer" key={idx}>
             <div className="commentList" onClick={(e) => commentListHandler(e, idx)}>
-              <div className="content">{comment.comment.content}</div>
-              <div className="date">{formatDate(comment.comment.createdAt)}</div>
+              <div className="content">{commentAndReplies.comment.content}</div>
+              <div className="date">{formatDate(commentAndReplies.comment.createdAt)}</div>
             </div>
             {isCommentOpen && idx === commentIdx ?
               <CommentDetails>
-                {curComments.map((subcomment: { [key:string] : any }, idx) => {
-                    if (subcomment.userId === leaderId) {
+                {curComments.map((commentElement: { [key:string] : any }, idx) => {
+                    if (commentElement.userId === leaderId) {
                       return (
                         <div key={idx} className="subcommentList">
+                          {console.log(curComments)}
                           {isLeader ?
                             <button
                               className="delete"
-                              onClick={(e) => commentDeleteModalHandler(e, idx, subcomment.id)}
+                              onClick={(e) => commentDeleteModalHandler(e, idx, curComments[0].id, commentElement.id)}
                             >
                               <FontAwesomeIcon icon={ faTrashAlt } />
                             </button>
                           : null}
                           <div className="subCommentContainer" style={{ backgroundColor: "#50C9C3", color: "#fff" }}>
-                            <div className="subContent">{subcomment.content}</div>
-                            <div className="date">{formatDate(subcomment.createdAt)}</div>
+                            <div className="subContent">{commentElement.content}</div>
+                            <div className="date">{formatDate(commentElement.createdAt)}</div>
                           </div>
                           <div className="profileContainer">
-                            <div className="profileImage" style={{ backgroundImage: `url(${subcomment.profileImage})`, backgroundSize: "cover" }} />
-                            <div className="nameplate"><FontAwesomeIcon icon={ faFlag } id="leader" /> {subcomment.userName}</div>
+                            <div className="profileImage" style={{ backgroundImage: `url(${commentElement.profileImage})`, backgroundSize: "cover" }} />
+                            <div className="nameplate"><FontAwesomeIcon icon={ faFlag } id="leader" /> {commentElement.userName}</div>
                           </div>
                         </div>
                       )
@@ -332,23 +334,17 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
                       return (
                         <div key={idx} className="subcommentList">
                           <div className="profileContainer">
-                            <div className="profileImage" style={{ backgroundImage: `url(${subcomment.profileImage})`, backgroundSize: "cover" }} />
-                            {/* <img
-                              className="profileImage"
-                              src={subcomment.profileImage}
-                              alt="User Profile Image"
-                              style={{objectFit: "cover" }}
-                            /> */}
-                            <div className="nameplate">{subcomment.userName}</div>
+                            <div className="profileImage" style={{ backgroundImage: `url(${commentElement.profileImage})`, backgroundSize: "cover" }} />
+                            <div className="nameplate">{commentElement.userName}</div>
                           </div>
                           <div className="subCommentContainer" style={{ border: "1px solid #d5d5d5" }}>
-                            <div className="subContent">{subcomment.content}</div>
-                            <div className="date">{formatDate(subcomment.createdAt)}</div>
+                            <div className="subContent">{commentElement.content}</div>
+                            <div className="date">{formatDate(commentElement.createdAt)}</div>
                           </div>
-                          {subcomment.userId === userId ?
+                          {commentElement.userId + "" === userId + "" ?
                             <button
                               className="delete"
-                              onClick={(e) => commentDeleteModalHandler(e, idx, subcomment.id)}
+                              onClick={(e) => commentDeleteModalHandler(e, idx, curComments[0].id, commentElement.id)}
                             >
                               <FontAwesomeIcon icon={ faTrashAlt } />
                             </button>
@@ -358,7 +354,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
                     }
                   }
                 )}
-                {isLeader || userId === comment.comment.userId ?
+                {isLeader || userId === commentAndReplies.comment.userId ?
                   <CommentInput>
                     <textarea
                       name="subcomment"
@@ -367,7 +363,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
                     />
                     <button
                       className="submit"
-                      onClick={(e) => replyHandler(e, comment.comment.id)}
+                      onClick={(e) => replyHandler(e, commentAndReplies.comment.id)}
                       disabled={!newComment.subcomment}
                     >
                       등록하기
