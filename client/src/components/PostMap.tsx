@@ -90,7 +90,6 @@ export default function PostMap({ coordinates, location, name, image, handleCoor
           const { La, Ma } = coordinates;
           setCoords({ lat: Ma, lng: La });
           handleCoordsChange(Ma, La);
-          // console.log(Ma, La);
         }
       });
     }

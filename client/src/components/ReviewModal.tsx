@@ -239,10 +239,6 @@ export default function ReviewModal({ reviewModalHandler, members, leaderId, isL
       handlePartyInfoChange("partyState", 2);
     }
     
-    console.log(reviewedMembers);
-    // await axios.post(`${process.env.REACT_APP_API_URL}/parties/${partyId}/review`, 
-    // { results: reviewedMembers }, 
-    // { headers, withCredentials: true });
 
     await sendRequest(
       HttpMethod.POST,

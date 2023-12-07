@@ -809,7 +809,6 @@ export default function PartyEdit({ party, editHandler, handleOnOff }: Props) {
         partyState: partyInfo.partyState,
         tags: tags
     });
-    console.log(res);
     return res;
   }
 

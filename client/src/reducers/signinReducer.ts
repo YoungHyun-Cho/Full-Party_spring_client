@@ -12,7 +12,7 @@ const initialState: InitialState = {
     id: 0.1,
     email:"", 
     userName: "",
-    profileImage: "https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultProfile.png",
+    profileImage: "https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com/defaultProfile.png",
     address: "",
     signupType: ""
   }

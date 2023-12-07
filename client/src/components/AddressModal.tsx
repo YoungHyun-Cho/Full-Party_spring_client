@@ -182,8 +182,6 @@ export default function  AddressModal() {
         { address, coordinates }
       );
 
-      console.log(res);
-
       if (res.status === 200) {
         
         setSessionStorage({ ...res.data });
@@ -214,7 +212,7 @@ export default function  AddressModal() {
                 </div>
                 <div className='mapInput'>
                   <UserAddressInput 
-                    profileImage={userInfo.profileImage ? userInfo.profileImage : "https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com/defaultProfile.png"}
+                    profileImage={userInfo.profileImage}
                     address={userInfo.address}
                     handleAddressChange={handleAddressChange}
                     handleCoordsChange={handleCoordsChange}

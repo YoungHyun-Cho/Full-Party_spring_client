@@ -172,8 +172,6 @@ type Props = {
 
 export default function QnA ({ partyId, isLeader, leaderId, commentsAndRepliesList, findComment }: Props) {
 
-  console.log(commentsAndRepliesList);
-
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector(
@@ -310,7 +308,6 @@ export default function QnA ({ partyId, isLeader, leaderId, commentsAndRepliesLi
                     if (commentElement.userId === leaderId) {
                       return (
                         <div key={idx} className="subcommentList">
-                          {console.log(curComments)}
                           {isLeader ?
                             <button
                               className="delete"

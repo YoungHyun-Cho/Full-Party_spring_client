@@ -164,7 +164,6 @@ export default function Notification() {
           `${process.env.REACT_APP_API_URL}/notifications`,
           null
         );
-        console.log(response);
         dispatch({
           type: NOTIFY,
           payload: {

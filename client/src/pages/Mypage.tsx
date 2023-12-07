@@ -573,6 +573,15 @@ export default function Mypage() {
     return year + "-" + (month < 10 ? `0${month}` : `${month}`) + "-" + date;
   };
 
+  const getProfileImageName = (url: string) => {
+    
+    if (signupType === "google" || signupType === "kakao") return url;
+    
+    const splitedProfileImage = url.split("/");
+    
+    return splitedProfileImage[splitedProfileImage.length - 1];
+  }
+
   const submitInfo = async () => {
     const { userName, profileImage, password, confirm, birth, gender, address, mobile, nowPwd } = changeInfo;
     const { isName, isMobile } = isError;
@@ -593,15 +602,13 @@ export default function Mypage() {
         mobileMsg: '',
         axiosMsg: '',
       });
-      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}`, {
-        profileImage,
-        userName,
-        birth,
-        gender,
-        address,
-        coordinates,
-        mobile
-      });
+
+      const res = await sendRequest(
+        HttpMethod.PATCH,
+        `${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}`,
+        { profileImage: getProfileImageName(profileImage, ), userName, birth, 
+          gender, address, coordinates, mobile }
+      );
       if (res.status === 200) {
         setIsChange(false);
         const payload = {
@@ -617,16 +624,12 @@ export default function Mypage() {
     }
     else if (password !== '') {
 
-      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}`, {
-        profileImage,
-        userName,
-        password: nowPwd,
-        birth,
-        gender,
-        address,
-        coordinates,
-        mobile
-      });
+      const res = await sendRequest(
+        HttpMethod.PATCH,
+        `${process.env.REACT_APP_API_URL}/users/${signinReducer.userInfo?.id}`, 
+        { profileImage: getProfileImageName(profileImage), userName, password: nowPwd, 
+          birth, gender, address, coordinates, mobile }
+      );
       if (res.status === 200) {
         setIsChange(false);
         const payload = {
@@ -749,7 +752,7 @@ export default function Mypage() {
         <div className="leftWrapper">
           <div className='profileImageContainer'>
             <img
-              src={basicInfo.profileImage ? basicInfo.profileImage : 'https://fullpartyspringimageserver.s3.ap-northeast-2.amazonaws.com/defaultProfile.png'}
+              src={basicInfo.profileImage}
               alt='thumbnail'
             />
           </div>

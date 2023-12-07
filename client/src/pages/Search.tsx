@@ -161,8 +161,7 @@ export default function Search() {
         setCoordinates(res.data.coordinates);
 
         const partyData = res.data.result;
-        console.log(res);
-        // const parsedData = partyData.map((party: any) => ({ ...party, "latlng": JSON.parse(party.latlng) }));
+
         dispatch({
           type: NOTIFY,
           payload: {

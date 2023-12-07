@@ -176,11 +176,6 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
   const [ isEditMode, setIsEditMode ] = useState(false);
   const [ newMsg, setNewMsg ] = useState(message);
 
-  const headers: Headers = {
-    Authorization: "Bearer " + cookieParser()["token"],
-    Refresh: cookieParser()["refresh"]
-  };
-
   const formatDate = (date: String) => date.slice(0, 10);
 
   const closeModal =() => {
@@ -212,8 +207,6 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
   };
 
   const expelHandler = async () => {
-    // await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyId}/participation/${userInfo.id}`, 
-    // { headers, withCredentials: true });
 
     await sendRequest(
       HttpMethod.DELETE,
@@ -225,7 +218,6 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
   };
 
   const refuseHandler = async () => {
-    // await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyId}/application/${userId}`);
     
     await sendRequest(
       HttpMethod.DELETE,
@@ -237,11 +229,6 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
   };
 
   const acceptHandler = async () => {
-    // console.log(userId)
-    // await axios.post(`${process.env.REACT_APP_API_URL}/parties/${partyId}/participation/${userInfo.id}`, 
-    //   {},
-    //   { headers, withCredentials: true }
-    // );
 
     await sendRequest(
       HttpMethod.POST,
@@ -258,7 +245,7 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
         <ModalView onClick={(e) => e.stopPropagation()}>
           <CloseBtn onClick={closeModal}><FontAwesomeIcon icon={faTimes} /></CloseBtn>
           <header>{from === "members"? <>Party<br />Member</> : <>Quest<br />Volunteer</>}</header>
-          {isMember ?
+          {isMember  && userInfo.id !== leaderId ?
             <section className="speechBubble">
               {isEditMode ?
                 <input
@@ -294,10 +281,10 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
             </div>
           </section>
           <UserStateBtns>
-            {id === userId && !isEditMode ? 
+            {id === userId && !isEditMode  && !isLeader ? 
               <button onClick={editHandler}>메시지 수정</button> 
             : null}
-            {id === userId && isEditMode ? 
+            {id === userId && isEditMode  && !isLeader ? 
               <button onClick={editConfirmHandler}>변경 사항 적용</button> 
             : null}
             {isLeader && id !== userId && from === "members" && (partyState === "모집 중" || partyState === "모집 완료") ? 

@@ -479,7 +479,6 @@ export default function SignupModal() {
 
   const handleSignup = async () => {
 
-    console.log(userInfo);
     const { profileImage, email, password, name, gender, birth, mobile, address } = userInfo;
     const { isEmail, isName, isGender, isBirth, isMobile } = isError;
 
@@ -510,11 +509,6 @@ export default function SignupModal() {
       });
 
       setIsRequested(true);
-
-      console.log(        {
-        userName: name, profileImage, email, password, 
-        birth, gender, mobile, address, coordinates
-      });
 
       await sendRequest(
         HttpMethod.POST,

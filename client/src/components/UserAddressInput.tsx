@@ -38,8 +38,6 @@ export default function UserAddressInput({ profileImage, address, handleAddressC
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { address, extraAddress } = fullAddress;
 
-    console.log(address)
-
     setFullAddress({
       ...fullAddress,
       detailedAddress: event.target.value,

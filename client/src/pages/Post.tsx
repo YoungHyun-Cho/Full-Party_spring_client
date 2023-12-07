@@ -750,11 +750,6 @@ export default function Post() {
 
   const validationCheck = () => {
 
-    console.log(partyInfo.startDate)
-    console.log(partyInfo.endDate)
-    console.log(formattedToday)
-    console.log(partyInfo.endDate < formattedToday)
-
     if (partyInfo.startDate > partyInfo.endDate || partyInfo.endDate < formattedToday) {
 
       setIsEndDate({
@@ -969,14 +964,12 @@ export default function Post() {
 
         if (response.status === 201) {
           setIsPosted(false);
-          console.log(response.headers.location);
           const matches = response.headers.location.match(/\d+$/);
           const partyId = matches ? matches[0] : -1;
           navigate(`../party/${partyId}`);// 헤더에 설정된 Location값으로 리디렉션  
         }
 
         else {
-          console.log(response);
           setIsErrorModalOpen(true);
           setIsPosted(false);
         }

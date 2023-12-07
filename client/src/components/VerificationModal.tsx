@@ -122,16 +122,6 @@ export default function  VerificationModal({ userId, email, handleIsChange, verf
     catch (error: any) {
       if (error.response.status === 404) setErrorMsg('비밀번호가 틀렸습니다. 다시 확인해주세요.');
     }
-
-    // console.log(response);
-
-    // if (response.data.message === "Unauthorized User") setErrorMsg('비밀번호가 틀렸습니다. 다시 확인해주세요.');
-    // if (response.status === 302) setErrorMsg('비밀번호가 틀렸습니다. 다시 확인해주세요.');
-    // else if (response.data.message === "User Identified") {
-    // else if (response.status === 200) {
-    //   handleIsChange();
-    //   closeModal();
-    // }
   };
 
   return (

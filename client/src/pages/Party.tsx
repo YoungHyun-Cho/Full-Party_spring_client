@@ -566,7 +566,6 @@ export default function Party() {
       );
 
       if (response.status === 200) {
-        console.log(response);
         setPartyInfo({ ...response.data });
         setComments(response.data.comments);
         
