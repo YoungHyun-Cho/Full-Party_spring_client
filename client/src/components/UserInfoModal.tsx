@@ -191,9 +191,6 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
   };
 
   const editConfirmHandler = async () => {
-    await axios.patch(`${process.env.REACT_APP_API_URL}/parties/${partyId}/users/${userInfo.id}/message`, {
-      message: newMsg,
-    });
 
     await sendRequest(
       HttpMethod.PATCH,

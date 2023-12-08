@@ -211,7 +211,6 @@ export default function Notification() {
                   <div className="iconContainer">
                     <FontAwesomeIcon icon={ faTrophy } className="icon level" />
                   </div>
-                  {/* <span><strong>Lv.{notification.level}</strong>{message[notification.content]}</span> */}
                   <div className="titleContainer">
                     <div className="partyNameContainer">
                       [<div className="partyName">{notification.subject}</div>] 
@@ -226,8 +225,6 @@ export default function Notification() {
         }
         else {
           return (
-            // notification.type === "do not link" ? `/home` : `/party/${notification.partyId}`
-            // <Link to={`/party/${notification.partyId}${notification.commentId ? `/${notification.commentId}` : ""}`} style={{ textDecoration: 'none' }} key={idx}>
             <Link to={notification.label === NotificationType.DISMISS ? `/home` : `/party/${notification.partyId}`} style={{ textDecoration: 'none' }} key={idx}>
               <div key={idx} className="notificationList" style={{ background: notification.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
                 <div className="contentWrapper">

@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faMapMarkerAlt, faCalendarAlt, faGlobe, faExclamation } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
 import { useSelector } from 'react-redux';
-import { Headers, cookieParser } from '../App';
+import { Headers, HttpMethod, cookieParser, sendRequest } from '../App';
 
 export const QuestCardContainer = styled.div`
   width: 100%;
@@ -179,16 +179,21 @@ export default function QuestCard ({ party }: Props) {
   const favoriteHandler = async (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
     if (!like) {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/hearts/${id}`, 
-        {}, 
-        { headers, withCredentials: true }
+      const response = await sendRequest(
+        HttpMethod.POST,
+        `${process.env.REACT_APP_API_URL}/hearts/${id}`,
+        {}
       );
+
       if (response.status === 201) setLike(true); // 수정 필요
     }
     else {
-      const response = await axios.delete(`${process.env.REACT_APP_API_URL}/hearts/${id}`, 
-        { headers, withCredentials: true }
+      const response = await sendRequest(
+        HttpMethod.DELETE,
+        `${process.env.REACT_APP_API_URL}/hearts/${id}`,
+        null
       );
+      
       if (response.status === 204) setLike(false); // 수정 필요
     }
     

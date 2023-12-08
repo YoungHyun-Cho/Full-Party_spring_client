@@ -127,6 +127,7 @@ export const Main = styled.section`
       padding: 30px 30px 10px 30px;
       font-size: 1.2rem;
       line-height: 2rem;
+      word-wrap: break-word;
     }
   }
 
@@ -397,8 +398,10 @@ export default function Party() {
     
     if (partyInfo.isHeart) {
 
-      await axios.delete(`${process.env.REACT_APP_API_URL}/hearts/${partyInfo.id}`, 
-        { headers, withCredentials: true }
+      await sendRequest(
+        HttpMethod.DELETE,
+        `${process.env.REACT_APP_API_URL}/hearts/${partyInfo.id}`,
+        null
       );
       
       setPartyInfo({
@@ -409,9 +412,10 @@ export default function Party() {
     }
     else {
 
-      await axios.post(`${process.env.REACT_APP_API_URL}/hearts/${partyInfo.id}`, 
-        {}, 
-        { headers, withCredentials: true }
+      await sendRequest(
+        HttpMethod.POST,
+        `${process.env.REACT_APP_API_URL}/hearts/${partyInfo.id}`,
+        {}
       );
 
       setPartyInfo({
@@ -437,8 +441,8 @@ export default function Party() {
         description: `${partyInfo.content}\n ${hashtags}`,
         imageUrl: partyInfo.image,
         link: {
-          mobileWebUrl: `https://fullpartypro.com/party/${params.partyId}`,
-          webUrl: `https://fullpartypro.com/party/${params.partyId}`,
+          mobileWebUrl: `fullpartyspring.com/party/${params.partyId}`,
+          webUrl: `fullpartyspring.com/party/${params.partyId}`,
         },
       },
       social: {
@@ -548,7 +552,11 @@ export default function Party() {
   };
 
   const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}`);
+    await sendRequest(
+      HttpMethod.DELETE,
+      `${process.env.REACT_APP_API_URL}/parties/${partyInfo.id}`,
+      null
+    );
     navigate('../home');
   };
 
@@ -710,9 +718,9 @@ export default function Party() {
         </FavAndTag>
 
         <section className="contentContainer">
-          <pre className="content">
+          <div className="content">
             { partyInfo.content }
-          </pre>
+          </div>
         </section>
 
         <TimeandLocation>

@@ -449,15 +449,15 @@ export default function Home() {
       <Footer>
         <div className="teamMembers">
           <div className="title">
-            <br />프로젝트 "풀팟"
+            <br />프로젝트 [풀팟]
           </div>
           Made By 조범, 김아영, 정재현, 조영현 
           <br />Refactored By 조영현
+          <br />
         </div>
+        <br />
         <div className="contact">
-          <div className="title">Contact Us</div>
-          <FontAwesomeIcon icon={ faEnvelope } className="icon" />psyhyun1030@gmail.com
-          <br /><FontAwesomeIcon icon={ faCodeBranch } className="icon" /><a href="https://github.com/codestates/Full_Party_pro/wiki" target="_blank" rel="noreferrer">github.com/codestates/Full_Party_pro</a>
+          <FontAwesomeIcon icon={ faCodeBranch } className="icon" /><a className="title" href="https://www.notion.so/c925937b6a6141db92ff44ca0e837eab" target="_blank" rel="noreferrer">About 풀팟</a>
         </div>
       </Footer>
     </HomeContainer>

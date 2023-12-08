@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { HttpMethod, sendRequest } from '../App';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -84,8 +85,22 @@ export default function CommentDeleteModal({ commentDeleteModalHandler, commentT
   };
 
   const deleteHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (idx === 0 && originalCommentId === commentElementId) await axios.delete(`${process.env.REACT_APP_API_URL}/comments/${originalCommentId}`);
-    else await axios.delete(`${process.env.REACT_APP_API_URL}/comments/${originalCommentId}/replies/${commentElementId}`);
+    
+    if (idx === 0 && originalCommentId === commentElementId) {
+      await sendRequest(
+        HttpMethod.DELETE,
+        `${process.env.REACT_APP_API_URL}/comments/${originalCommentId}`,
+        null
+      );
+    }
+    else {
+      await sendRequest(
+        HttpMethod.DELETE,
+        `${process.env.REACT_APP_API_URL}/comments/${originalCommentId}/replies/${commentElementId}`,
+        null
+      );
+    }
+
     commentDeleteModalHandler();
     navigate(`../party/${partyId}`);
   };

@@ -77,9 +77,9 @@ type Props = {
 
 export default function LocalMap({ coordinates, localParty }: Props) {
   const navigate = useNavigate();
-  const { kakao } = window;
-  const geocoder = new kakao.maps.services.Geocoder();
   const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
+
+  console.log(coordinates);
 
   type p = {
     party: { [key: string]: any }

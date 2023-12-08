@@ -7,7 +7,7 @@ import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../reducers';
 import { NOTIFY } from "../actions/notify"
-import { Headers, cookieParser } from '../App';
+import { Headers, HttpMethod, cookieParser, sendRequest } from '../App';
 
 export const FavoriteContainer = styled.div`
   width: 100%;
@@ -47,9 +47,12 @@ export default function Favorite() {
 
   useEffect(() => {
     (async () => {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/hearts`, {
-        headers, withCredentials: true
-      });
+
+      const response = await sendRequest(
+        HttpMethod.GET,
+        `${process.env.REACT_APP_API_URL}/hearts`,
+        null
+      );
       console.log(response);
       dispatch({
         type: NOTIFY,
